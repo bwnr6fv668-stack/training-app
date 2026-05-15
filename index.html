@@ -116,7 +116,7 @@ const info = {
  }
 };
 
-let logs = JSON.parse(localStorage.getItem("logs") || {});
+let logs = JSON.parse(localStorage.getItem("logs") || "{}");
 let currentDay="Day 1";
 let view="workout";
 let openInfo=null;
