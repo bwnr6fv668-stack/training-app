@@ -4,305 +4,87 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Inner Strength</title>
 
-<!-- ✅ iPhone app icon -->
-<img src="logo.png" class="logo">
+<link rel="apple-touch-icon" href="logo.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Inner Strength">
 
 <style>
 body {
   font-family: -apple-system, Arial;
-  max-width: 500px;
+  background: #f8fafc;
+  max-width: 480px;
   margin: auto;
-  padding: 14px;
-  background: #f2f4f7;
+  padding: 16px;
 }
 
-h2 {
- <div style="
-  text-align:center;
-  padding:16px;
-  background: linear-gradient(135deg, #2563eb, #1e40af);
-  border-radius:16px;
-  margin-bottom:16px;
-  color:white;
-">
+/* ✅ HEADER */
+.header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+}
 
-  logo.png
-
-  <div style="
-    font-size:18px;
-    font-weight:600;
-    margin-top:6px;
-  ">
-    Inner Strength
-  </div>
-
-</div>
-
-/* ✅ LOGO */
 .logo {
-  width:80px;
-  display:block;
-  margin:auto;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
 }
 
-/* ✅ NAV */
+.title {
+  font-size: 18px;
+  font-weight: 600;
+}
+
+/* ✅ DAYS */
 .day-row {
-  display:flex;
-  overflow-x:auto;
-  margin-bottom:10px;
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  margin-bottom: 16px;
 }
 
 .day-btn {
-  background:#ddd;
-  color:black;
-  padding:8px;
+  padding: 8px 12px;
+  background: #e5e7eb;
+  border-radius: 999px;
+  font-size: 13px;
+  white-space: nowrap;
 }
 
 .active {
-  background:#2563eb;
-  color:white;
+  background: #2563eb;
+  color: white;
 }
 
-/* ✅ BUTTON */
+/* ✅ CARD (clean, not boxy) */
+.card {
+  padding: 12px 0;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+/* ✅ ROW */
+.row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* ✅ SMALL TEXT */
+.small {
+  font-size: 12px;
+  color: #6b7280;
+  margin-top: 4px;
+}
+
+/* ✅ BUTTONS */
 button {
-  border:none;
-  border-radius:10px;
-  padding:10px;
-  margin:3px;
-  background:#2563eb;
-  color:white;
-  font-size:14px;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 10px;
+  background: #2563eb;
+  color: white;
+  font-size: 13px;
 }
 
 button:active {
-  transform:scale(0.96);
-}
-
-/* ✅ CARD */
-.card {
-  background:white;
-  border-radius:14px;
-  padding:14px;
-  margin-bottom:14px;
-  box-shadow:0 6px 14px rgba(0,0,0,0.08);
-}
-
-.row {
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-}
-
-.small {
-  font-size:12px;
-  color:#6b7280;
-}
-
-/* ✅ INFO BOX */
-.info-box {
-  background:#eef3ff;
-  padding:10px;
-  border-radius:10px;
-  margin-top:8px;
-}
-
-/* ✅ RPE */
-.rpe-btn {
-  background:#e5e7eb;
-  color:black;
-}
-
-.rpe-active {
-  background:#2563eb;
-  color:white;
-}
-</style>
-
-</head>
-
-<body>
-
-<!-- ✅ LOGO + TITLE -->
-logo.png
-<h2>Inner Strength</h2>
-
-<div id="app"></div>
-
-<script>
-
-const workouts = {
- "Day 1":[
-  "Incline DB Bench (Neutral Grip)",
-  "Half-Kneeling Landmine Press",
-  "DB Fly (Short Range)",
-  "Lateral Raise",
-  "Triceps Pressdown"
- ],
- "Day 2":[
-  "Goblet Squat to Box",
-  "Romanian Deadlift",
-  "Reverse Lunge",
-  "Hip Thrust / Glute Bridge",
-  "Pallof Press"
- ],
- "Day 3":[
-  "Incline Treadmill Walk",
-  "Kettlebell Swing"
- ],
- "Day 4":[
-  "Chest-Supported DB Row",
-  "Neutral-Grip Pulldown",
-  "Face Pull",
-  "Hammer Curl",
-  "Farmer's Carry"
- ],
- "Day 5":[
-  "Complex Deadlift",
-  "Complex Row",
-  "Complex Clean",
-  "Complex Front Squat",
-  "Complex Push Press",
-  "Kettlebell Swing"
- ]
-};
-
-const info = {
-"Incline DB Bench (Neutral Grip)":"Control descent, keep elbows tucked, press through upper chest.",
-"Half-Kneeling Landmine Press":"Stay upright, engage core, press forward and up.",
-"DB Fly (Short Range)":"Small range, controlled stretch, squeeze chest.",
-"Lateral Raise":"Lift to shoulder level, control down.",
-"Triceps Pressdown":"Elbows tight, full extension.",
-"Goblet Squat to Box":"Sit back, chest up, drive through heels.",
-"Romanian Deadlift":"Hip hinge, stretch hamstrings, neutral spine.",
-"Reverse Lunge":"Step back, control descent, push through front leg.",
-"Hip Thrust / Glute Bridge":"Drive hips up, squeeze glutes at top.",
-"Pallof Press":"Press straight out, resist rotation.",
-"Incline Treadmill Walk":"Keep posture tall, steady breathing.",
-"Kettlebell Swing":"Explosive hip hinge, arms relaxed.",
-"Chest-Supported DB Row":"Pull elbows back, squeeze lats.",
-"Neutral-Grip Pulldown":"Pull to chest, control return.",
-"Face Pull":"Pull high, squeeze rear delts.",
-"Hammer Curl":"Neutral grip, controlled motion.",
-"Farmer's Carry":"Walk tall, core tight.",
-"Complex Deadlift":"Controlled hinge start.",
-"Complex Row":"Pull to torso.",
-"Complex Clean":"Explosive upward movement.",
-"Complex Front Squat":"Elbows high, upright torso.",
-"Complex Push Press":"Dip then drive overhead."
-};
-
-let logs = JSON.parse(localStorage.getItem("logs") || "{}");
-
-let currentDay="Day 1";
-let openInfo=null;
-
-let current = {
- weight:100,
- reps:8,
- rpe:8,
- speed:3,
- incline:5
-};
-
-function toggleInfoSafe(btn){
- const ex = btn.getAttribute("data-exercise");
- openInfo = openInfo===ex ? null : ex;
- render();
-}
-
-function logSetSafe(btn){
- const ex = btn.getAttribute("data-exercise");
- logSet(ex);
-}
-
-function setDay(d){ currentDay=d; render(); }
-function adjust(field,val){ current[field]+=val; render(); }
-
-function isCardio(ex){
- return currentDay==="Day 3" && ex==="Incline Treadmill Walk";
-}
-
-function logSet(ex){
- if(!logs[currentDay]) logs[currentDay]={};
- if(!logs[currentDay][ex]) logs[currentDay][ex]=[];
-
- let entry = isCardio(ex)
- ? {speed:current.speed,incline:current.incline}
- : {weight:current.weight,reps:current.reps,rpe:current.rpe};
-
- logs[currentDay][ex].push(entry);
- localStorage.setItem("logs",JSON.stringify(logs));
- render();
-}
-
-function render(){
-
- let html="<div class='day-row'>";
-
- for(let d in workouts){
- html+=`<button class="day-btn ${d===currentDay?'active':''}" onclick="setDay('${d}')">${d}</button>`;
- }
-
- html+="</div>";
-
- workouts[currentDay].forEach(ex=>{
-
- html+=`<div class="card">`;
-
- html+=`
- <div class="row">
-  <b>${ex}</b>
-  <button onclick="toggleInfoSafe(this)" data-exercise="${ex}">ⓘ</button>
- </div>`;
-
- if(openInfo===ex){
-   html+=`<div class="info-box">${info[ex]}</div>`;
- }
-
- let last = logs[currentDay]?.[ex]?.slice(-1)[0];
-
- if(last){
-   html+=`<div class="small">
-   Last: ${last.speed
-    ? `${last.speed}/${last.incline}`
-    : `${last.weight}x${last.reps}`}
-   </div>`;
- }
-
- if(isCardio(ex)){
-   html+=`
-   Speed ${current.speed}
-   <button onclick="adjust('speed',.1)">+</button>
-   <button onclick="adjust('speed',-.1)">-</button><br>
-   Incline ${current.incline}
-   <button onclick="adjust('incline',1)">+</button>
-   <button onclick="adjust('incline',-1)">-</button>`;
- } else {
-   html+=`
-   Weight ${current.weight}
-   <button onclick="adjust('weight',5)">+</button>
-   <button onclick="adjust('weight',-5)">-</button><br>
-   Reps ${current.reps}
-   <button onclick="adjust('reps',1)">+</button>
-   <button onclick="adjust('reps',-1)">-</button><br>
-   RPE:
-   ${[6,7,8,9].map(r=>
-   `<button class="${current.rpe===r?'rpe-active':'rpe-btn'}"
-   onclick="current.rpe=${r};render()">${r}</button>`).join("")}`;
- }
-
- html+=`<br><button onclick="logSetSafe(this)" data-exercise="${ex}">Track Set</button>`;
-
- html+=`</div>`;
- });
-
- document.getElementById("app").innerHTML=html;
-}
-
-render();
-
-</script>
-</body>
-</html>
