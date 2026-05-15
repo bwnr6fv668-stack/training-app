@@ -14,107 +14,68 @@ body {
   margin: auto;
 }
 
-h2 {
-  text-align: center;
-  margin-bottom: 10px;
-}
+h2 { text-align:center; }
 
 button {
-  border: none;
-  border-radius: 8px;
-  padding: 10px;
-  margin: 4px;
-  font-size: 14px;
-  background: #2563eb;
-  color: white;
-}
-
-button:active { transform: scale(0.96); }
-
-.top-buttons {
-  display: flex;
-  justify-content: space-around;
-  margin-bottom: 12px;
-}
-
-.day-row {
-  display: flex;
-  overflow-x: auto;
-  margin-bottom: 10px;
-}
-
-.day-btn {
-  background: #ddd;
-  color: black;
-}
-
-.active {
-  background: #2563eb;
-  color: white;
+  border:none;
+  border-radius:8px;
+  padding:10px;
+  margin:4px;
+  font-size:14px;
+  background:#2563eb;
+  color:white;
 }
 
 .card {
-  background: white;
-  border-radius: 14px;
-  padding: 12px;
-  margin-bottom: 12px;
-  box-shadow: 0 6px 14px rgba(0,0,0,0.07);
+  background:white;
+  padding:12px;
+  border-radius:12px;
+  margin-bottom:12px;
+  box-shadow:0 4px 10px rgba(0,0,0,0.08);
 }
 
 .title-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+  display:flex;
+  justify-content:space-between;
 }
 
 .small {
-  font-size: 12px;
-  color: #777;
-  margin-top: 4px;
+  font-size:12px;
+  color:#777;
+  margin-top:4px;
 }
 
-.controls {
-  margin-top: 10px;
-}
+.controls { margin-top:8px; }
 
 .control-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-top: 6px;
-}
-
-.rpe-btn {
-  background: #ddd;
-  color: black;
-}
-
-.rpe-active {
-  background: #2563eb;
-  color: white;
-}
-
-.info-box {
-  background: #eef3ff;
-  padding: 10px;
-  border-radius: 10px;
-  margin-top: 10px;
+  display:flex;
+  justify-content:space-between;
+  margin-top:5px;
 }
 
 .video {
-  width: 100%;
-  margin-top: 8px;
-  border-radius: 10px;
+  width:100%;
+  margin-top:10px;
+  border-radius:10px;
+}
+
+.active { background:#2563eb; color:white; }
+.day-btn { background:#ddd; color:black; }
+
+.info-box {
+  background:#eef3ff;
+  padding:8px;
+  border-radius:8px;
+  margin-top:8px;
 }
 </style>
 
 </head>
-
 <body>
 
 <h2>🏋️ Training</h2>
 
-<div class="top-buttons">
+<div>
 <button onclick="view='workout';render()">Workout</button>
 <button onclick="view='audit';render()">Audit</button>
 </div>
@@ -124,85 +85,53 @@ button:active { transform: scale(0.96); }
 <script>
 
 const workouts = {
- "Day 1":[
-  "Incline DB Bench (Neutral Grip)",
-  "Half-Kneeling Landmine Press",
-  "DB Fly (Short Range)",
-  "Lateral Raise",
-  "Triceps Pressdown"
- ],
- "Day 2":[
-  "Goblet Squat to Box",
-  "Romanian Deadlift",
-  "Reverse Lunge",
-  "Hip Thrust / Glute Bridge",
-  "Pallof Press"
- ],
- "Day 3":[
-  "Incline Treadmill Walk",
-  "Kettlebell Swing"
- ],
- "Day 4":[
-  "Chest-Supported DB Row",
-  "Neutral-Grip Pulldown",
-  "Face Pull",
-  "Hammer Curl",
-  "Farmer's Carry"
- ],
- "Day 5":[
-  "Complex Deadlift",
-  "Complex Row",
-  "Complex Clean",
-  "Complex Front Squat",
-  "Complex Push Press",
-  "Kettlebell Swing"
- ]
+ "Day 1":["Incline DB Bench (Neutral Grip)","Half-Kneeling Landmine Press","DB Fly (Short Range)","Lateral Raise","Triceps Pressdown"],
+ "Day 2":["Goblet Squat to Box","Romanian Deadlift","Reverse Lunge","Hip Thrust / Glute Bridge","Pallof Press"],
+ "Day 3":["Incline Treadmill Walk","Kettlebell Swing"],
+ "Day 4":["Chest-Supported DB Row","Neutral-Grip Pulldown","Face Pull","Hammer Curl","Farmer's Carry"],
+ "Day 5":["Complex Deadlift","Complex Row","Complex Clean","Complex Front Squat","Complex Push Press","Kettlebell Swing"]
 };
 
-// ✅ Embedded videos (YouTube embed URLs)
 const info = {
  "Incline DB Bench (Neutral Grip)": {
   instructions:"Upper chest press with neutral grip.",
-  video:"https://www.youtube.com/embed/8iPEnn-ltC8"
+  video:"8iPEnn-ltC8"
  },
  "Romanian Deadlift": {
   instructions:"Hip hinge, stretch hamstrings.",
-  video:"https://www.youtube.com/embed/jc1ogzTe1cA"
+  video:"jc1ogzTe1cA"
  },
  "Kettlebell Swing": {
-  instructions:"Explosive hip hinge.",
-  video:"https://www.youtube.com/embed/YSxHifyI1lA"
- },
- "Lateral Raise": {
-  instructions:"Raise arms to shoulder height.",
-  video:"https://www.youtube.com/embed/3VcKaXpzqRo"
- },
- "Face Pull": {
-  instructions:"Rear delts + upper back.",
-  video:"https://www.youtube.com/embed/rep-qVOkqgk"
+  instructions:"Explosive hip hinge movement.",
+  video:"YSxHifyI1lA"
  }
 };
 
 let logs = JSON.parse(localStorage.getItem("logs") || "{}");
+
 let currentDay="Day 1";
 let view="workout";
 let openInfo=null;
+let openVideo=null;
 
 let current = {
- weight:100,
- reps:8,
- rpe:8,
- speed:3,
- incline:5
+ weight:100, reps:8, rpe:8,
+ speed:3, incline:5
 };
 
 function toggleInfo(ex){
- openInfo = (openInfo === ex) ? null : ex;
+ openInfo = openInfo===ex ? null : ex;
+ openVideo=null;
+ render();
+}
+
+function toggleVideo(ex){
+ openVideo = openVideo===ex ? null : ex;
  render();
 }
 
 function setDay(d){
- currentDay = d;
+ currentDay=d;
  render();
 }
 
@@ -216,7 +145,6 @@ function isCardio(ex){
 }
 
 function logSet(ex){
-
  if(!logs[currentDay]) logs[currentDay]={};
  if(!logs[currentDay][ex]) logs[currentDay][ex]=[];
 
@@ -225,9 +153,7 @@ function logSet(ex){
  : {weight:current.weight,reps:current.reps,rpe:current.rpe};
 
  logs[currentDay][ex].push(entry);
-
  localStorage.setItem("logs", JSON.stringify(logs));
-
  render();
 }
 
@@ -237,13 +163,9 @@ function render(){
 
  if(view==="workout"){
 
-  html += `<div class="day-row">`;
-
   for(let d in workouts){
-   html+=`<button class="day-btn ${d===currentDay?'active':''}" onclick="setDay('${d}')">${d}</button>`;
+   html+=`<button class="${d===currentDay?'active day-btn':'day-btn'}" onclick="setDay('${d}')">${d}</button>`;
   }
-
-  html += `</div>`;
 
   workouts[currentDay].forEach(ex=>{
 
@@ -259,29 +181,30 @@ function render(){
    if(openInfo===ex){
     html+=`
     <div class="info-box">
-      ${info[ex]?.instructions || "Instructions coming soon"}
-      
+      ${info[ex]?.instructions || "No instructions yet"}
+
       ${info[ex]?.video
-        ? `${info[ex].video}</iframe>`
+        ? `<br><button onclick="toggleVideo('${ex}')">▶ Watch</button>`
         : ""
       }
-    </div>`;
+
+      ${
+        openVideo===ex
+        ? `<iframe class="video" src="https://www.youtube.com/embed/${info[ex].video}" frameborder="0;
    }
 
    let last = logs[currentDay]?.[ex]?.slice(-1)[0];
 
    if(last){
-    html+=`
-    <div class="small">
-      Last: ${
-        last.speed
+    html+=`<div class="small">
+      ${last.speed
         ? `${last.speed} mph / ${last.incline}%`
-        : `${last.weight} x ${last.reps} (RPE ${last.rpe || "-"})`
+        : `${last.weight} x ${last.reps}`
       }
     </div>`;
    }
 
-   html += `<div class="controls">`;
+   html+=`<div class="controls">`;
 
    if(isCardio(ex)){
     html+=`
@@ -299,10 +222,8 @@ function render(){
         <button onclick="adjust('incline',1)">+</button>
         <button onclick="adjust('incline',-1)">-</button>
       </div>
-    </div>
-    `;
+    </div>`;
    } else {
-
     html+=`
     <div class="control-row">
       Weight ${current.weight}
@@ -318,50 +239,19 @@ function render(){
         <button onclick="adjust('reps',1)">+</button>
         <button onclick="adjust('reps',-1)">-</button>
       </div>
-    </div>
-
-    <div class="control-row">
-      RPE
-      <div>
-        ${[6,7,8,9].map(r=>
-          `<button onclick="current.rpe=${r};render()" class="${current.rpe===r?'rpe-active':'rpe-btn'}">${r}</button>`
-        ).join("")}
-      </div>
-    </div>
-    `;
+    </div>`;
    }
 
-   html += `</div>`;
-
-   html += `<button onclick="logSet('${ex}')">Log Set</button>`;
-
-   html += `</div>`;
+   html+=`</div>`;
+   html+=`<button onclick="logSet('${ex}')">Log Set</button>`;
+   html+=`</div>`;
   });
  }
 
- if(view==="audit"){
-  html = "<h3>Progress</h3>";
-
-  for(let d in workouts){
-   workouts[d].forEach(ex=>{
-    let last = logs[d]?.[ex]?.slice(-1)[0];
-    if(last){
-      html += `<div class="small">${ex}: ${
-        last.speed
-        ? `${last.speed}/${last.incline}`
-        : `${last.weight}x${last.reps}`
-      }</div>`;
-    }
-   });
-  }
- }
-
- document.getElementById("app").innerHTML = html;
+ document.getElementById("app").innerHTML=html;
 }
 
 render();
-
 </script>
-
 </body>
 </html>
