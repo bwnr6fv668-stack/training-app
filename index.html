@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html>
 <head>
@@ -7,11 +6,11 @@
 
 <style>
 body {
-  font-family: -apple-system, Arial, sans-serif;
+  font-family: -apple-system, Arial;
   padding: 12px;
   max-width: 500px;
   margin: auto;
-  background: #f7f7f7;
+  background: #f5f5f5;
 }
 
 h2 { text-align:center; }
@@ -19,282 +18,221 @@ h2 { text-align:center; }
 button {
   border:none;
   border-radius:6px;
-  padding:8px 10px;
+  padding:6px 8px;
   margin:3px;
-  background:#2d6cdf;
+  background:#2563eb;
   color:white;
 }
 
 .card {
   background:white;
+  border-radius:8px;
   padding:10px;
-  border-radius:10px;
-  margin-bottom:12px;
-  box-shadow:0 2px 6px rgba(0,0,0,0.1);
+  margin-bottom:10px;
+  box-shadow:0 2px 5px rgba(0,0,0,0.1);
 }
 
 .small { font-size:12px; color:#666; }
-.best { color:green; font-weight:bold; font-size:12px; }
-.controls { display:flex; gap:10px; margin-top:5px; }
-.controls div { flex:1; }
 
-.audit-card {
-  background:white;
-  padding:8px;
-  border-radius:8px;
-  margin-bottom:8px;
-}
-
-.info-box {
-  font-size:12px;
+.info {
   background:#eef3ff;
-  padding:6px;
-  border-radius:6px;
+  padding:5px;
+  border-radius:5px;
   margin-top:5px;
 }
 </style>
-
 </head>
 
 <body>
 
-<h2>🏋️ Training App</h2>
+<h2>🏋️ Training</h2>
 
-<div>
 <button onclick="view='workout';render()">Workout</button>
 <button onclick="view='audit';render()">Audit</button>
-</div>
 
 <div id="app"></div>
 
 <script>
 
-const WORKOUT_DAYS = {
-  "Day 1": [
-    "Incline DB Bench (Neutral Grip)",
-    "Half‑Kneeling Landmine Press",
-    "DB Fly (Short Range)",
-    "Lateral Raise",
-    "Triceps Pressdown"
-  ],
-  "Day 2": [
-    "Goblet Squat to Box",
-    "Romanian Deadlift",
-    "Reverse Lunge",
-    "Hip Thrust / Glute Bridge",
-    "Pallof Press"
-  ],
-  "Day 3": [
-    "Incline Treadmill Walk",
-    "Kettlebell Swing"
-  ],
-  "Day 4": [
-    "Chest‑Supported DB Row",
-    "Neutral‑Grip Pulldown",
-    "Face Pull",
-    "Hammer Curl",
-    "Farmer’s Carry"
-  ],
-  "Day 5": [
-    "Complex – Deadlift",
-    "Complex – Bent‑Over Row",
-    "Complex – Hang Clean",
-    "Complex – Front Squat",
-    "Complex – Push Press",
-    "Kettlebell Swing"
-  ]
-};
-
-const EXERCISE_INFO = {
-  "Incline DB Bench (Neutral Grip)": {
-    instructions: "Keep elbows slightly tucked, control the descent, press smoothly.",
-    video: "https://www.youtube.com/watch?v=8iPEnn-ltC8"
-  },
-  "Romanian Deadlift": {
-    instructions: "Push hips back, slight knee bend, keep bar close to legs.",
-    video: "https://www.youtube.com/watch?v=jc1ogzTe1cA"
-  },
-  "Incline Treadmill Walk": {
-    instructions: "Maintain tall posture, steady pace, breathe rhythmically.",
-    video: ""
-  }
+const workouts = {
+ "Day 1":[
+  "Incline DB Bench",
+  "Landmine Press",
+  "DB Fly",
+  "Lateral Raise",
+  "Triceps Pressdown"
+ ],
+ "Day 2":[
+  "Goblet Squat",
+  "RDL",
+  "Reverse Lunge",
+  "Hip Thrust",
+  "Pallof Press"
+ ],
+ "Day 3":[
+  "Incline Walk",
+  "Kettlebell Swing"
+ ],
+ "Day 4":[
+  "Row",
+  "Pulldown",
+  "Face Pull",
+  "Hammer Curl",
+  "Farmer Carry"
+ ],
+ "Day 5":[
+  "Deadlift",
+  "Bent Row",
+  "Hang Clean",
+  "Front Squat",
+  "Push Press",
+  "Kettlebell Swing"
+ ]
 };
 
 let logs = JSON.parse(localStorage.getItem("logs") || "{}");
 
-let view = "workout";
-let currentDay = "Day 1";
+let currentDay="Day 1";
+let view="workout";
 
-let current = { weight:100, reps:8, rpe:8, speed:3.0, incline:5 };
+let current = {
+ weight:100,
+ reps:8,
+ rpe:8,
+ speed:3,
+ incline:5
+};
 
-function save(){ localStorage.setItem("logs",JSON.stringify(logs)); }
+function save(){
+ localStorage.setItem("logs",JSON.stringify(logs));
+}
 
-function adjust(field,amt){
-  current[field]=Math.max(0,current[field]+amt);
-  render();
+function adjust(field,val){
+ current[field]=Math.max(0,current[field]+val);
+ render();
 }
 
 function isCardio(ex){
-  return currentDay==="Day 3" && ex==="Incline Treadmill Walk";
+ return currentDay=="Day 3" && ex=="Incline Walk";
 }
 
 function logSet(ex){
+ if(!logs[currentDay]) logs[currentDay]={};
+ if(!logs[currentDay][ex]) logs[currentDay][ex]=[];
 
-  if(!logs[currentDay]) logs[currentDay]={};
-  if(!logs[currentDay][ex]) logs[currentDay][ex]=[];
+ let entry;
 
-  let entry;
+ if(isCardio(ex)){
+   entry={speed:current.speed,incline:current.incline};
+ } else {
+   entry={
+     weight:current.weight,
+     reps:current.reps,
+     rpe:current.rpe,
+     score:current.weight*current.reps
+   };
+ }
 
-  if(isCardio(ex)){
-    entry={ speed:current.speed, incline:current.incline };
-  } else {
-    entry={ weight:current.weight, reps:current.reps, rpe:current.rpe, score:current.weight*current.reps };
-  }
-
-  logs[currentDay][ex].push(entry);
-  save();
-  render();
-}
-
-function deleteSet(ex,i){
-  if(!confirm("Delete set?")) return;
-  logs[currentDay][ex].splice(i,1);
-  save();
-  render();
-}
-
-function editSet(ex,i){
-  let s=logs[currentDay][ex][i];
-
-  if(isCardio(ex)){
-    let speed=prompt("Speed",s.speed);
-    let incline=prompt("Incline",s.incline);
-    logs[currentDay][ex][i]={ speed:+speed, incline:+incline };
-  } else {
-    let weight=prompt("Weight",s.weight);
-    let reps=prompt("Reps",s.reps);
-    let rpe=prompt("RPE",s.rpe);
-    logs[currentDay][ex][i]={ weight:+weight, reps:+reps, rpe:+rpe, score:weight*reps };
-  }
-
-  save(); render();
-}
-
-function getLast(ex){
-  let sets=logs[currentDay]?.[ex]||[];
-  return sets.length?sets[sets.length-1]:null;
-}
-
-function getBest(ex){
-  let sets=logs[currentDay]?.[ex]||[];
-  if(!sets.length||isCardio(ex)) return null;
-  return sets.reduce((a,b)=>a.score>b.score?a:b);
-}
-
-function toggleInfo(id){
-  let el=document.getElementById(id);
-  el.style.display = el.style.display === "none" ? "block" : "none";
-}
-
-function buildAudit(){
-  let output="";
-  for(let d in WORKOUT_DAYS){
-    WORKOUT_DAYS[d].forEach(ex=>{
-      let sets=logs[d]?.[ex]||[];
-      if(sets.length){
-        let best=sets[sets.length-1];
-        if(best.speed){
-          output+=`<div class="audit-card"><b>${ex}</b><br>${best.speed} mph | ${best.incline}%</div>`;
-        } else {
-          best=sets.reduce((a,b)=>a.score>b.score?a:b);
-          output+=`<div class="audit-card"><b>${ex}</b><br>${best.weight} x ${best.reps}</div>`;
-        }
-      }
-    });
-  }
-  return output;
+ logs[currentDay][ex].push(entry);
+ save();
+ render();
 }
 
 function render(){
 
-let html="";
+ let html="";
 
-if(view==="workout"){
+ if(view=="workout"){
 
-  for(let d in WORKOUT_DAYS){
-    html+=`<button onclick="currentDay='${d}';render()">${d}</button>`;
+  for(let d in workouts){
+   html+=`<button onclick="currentDay='${d}';render()">${d}</button>`;
   }
 
-  WORKOUT_DAYS[currentDay].forEach(ex=>{
+  workouts[currentDay].forEach(ex=>{
 
-    let id = ex.replace(/[^a-zA-Z0-9]/g,"");
+   html+=`<div class="card"><b>${ex}</b>`;
 
-    html+=`<div class="card">
-    <b>${ex}</b>
-    <button onclick="toggleInfo('${id}')">ⓘ</button>`;
+   if(isCardio(ex)){
 
-    if(EXERCISE_INFO[ex]){
-      html+=`<div id="${id}" class="info-box" style="display:none">
-        ${EXERCISE_INFO[ex].instructions || ""}
-        ${EXERCISE_INFO[ex].video ? `<br><a href="${EXERCISE_INFO[ex].video}" target="_blank   </div>`;
-    }
+    html+=`
+    <div>
+     Speed ${current.speed}
+     <button onclick="adjust('speed',.1)">+</button>
+     <button onclick="adjust('speed',-.1)">-</button>
+    </div>
 
-    let last=getLast(ex);
-    if(last){
-      if(last.speed){
-        html+=`<div class="small">Last: ${last.speed} mph | ${last.incline}%</div>`;
-      } else {
-        html+=`<div class="small">Last: ${last.weight} x ${last.reps}</div>`;
-      }
-    }
+    <div>
+     Incline ${current.incline}
+     <button onclick="adjust('incline',1)">+</button>
+     <button onclick="adjust('incline',-1)">-</button>
+    </div>
+    `;
 
-    if(isCardio(ex)){
-      html+=`
-      <div class="controls">
-        <div>Speed:${current.speed}<br><button onclick="adjust('speed',0.1)">+0.1</button><button onclick="adjust('speed',-0.1)">-0.1</button></div>
-        <div>Incline:${current.incline}<br><button onclick="adjust('incline',1)">+1</button><button onclick="adjust('incline',-1)">-1</button></div>
-      </div>`;
+   } else {
+
+    html+=`
+    <div>
+     Weight ${current.weight}
+     <button onclick="adjust('weight',5)">+</button>
+     <button onclick="adjust('weight',-5)">-</button>
+    </div>
+
+    <div>
+     Reps ${current.reps}
+     <button onclick="adjust('reps',1)">+</button>
+     <button onclick="adjust('reps',-1)">-</button>
+    </div>
+
+    <div>
+     ${[6,7,8,9].map(r =>
+      `<button onclick="current.rpe=${r};render()">${r}</button>`
+     ).join("")}
+    </div>
+    `;
+   }
+
+   html+=`<button onclick="logSet('${ex}')">Log</button>`;
+
+   let sets=logs[currentDay]?.[ex]||[];
+
+   sets.forEach(s=>{
+    if(s.speed){
+     html+=`<div class="small">${s.speed} mph / ${s.incline}%</div>`;
     } else {
-      html+=`
-      <div class="controls">
-        <div>W:${current.weight}<br><button onclick="adjust('weight',5)">+5</button><button onclick="adjust('weight',-5)">-5</button></div>
-        <div>R:${current.reps}<br><button onclick="adjust('reps',1)">+1</button><button onclick="adjust('reps',-1)">-1</button></div>
-        <div>RPE:<br>${[6,7,8,9].map(r=>`<button onclick="current.rpe=${r};render()">${r}</button>`).join("")}</div>
-      </div>`;
+     html+=`<div class="small">${s.weight} x ${s.reps}</div>`;
     }
+   });
 
-    html+=`<button onclick="logSet('${ex}')">✅ Log</button>`;
-
-    let sets=logs[currentDay]?.[ex]||[];
-
-    sets.forEach((s,i)=>{
-      if(s.speed){
-        html+=`<div class="small">${s.speed} mph | ${s.incline}% <button onclick="editSet('${ex}',${i})">✏️</button><button onclick="deleteSet('${ex}',${i})">🗑️</button></div>`;
-      } else {
-        html+=`<div class="small">${s.weight} x ${s.reps}<button onclick="editSet('${ex}',${i})">✏️</button><button onclick="deleteSet('${ex}',${i})">🗑️</button></div>`;
-      }
-    });
-
-    let best=getBest(ex);
-    if(best){
-      html+=`<div class="best">Best: ${best.weight} x ${best.reps}</div>`;
-    }
-
-    html+=`</div>`;
+   html+="</div>";
   });
-}
 
-if(view==="audit"){
-  html+=`<h3>Strength Audit</h3>`;
-  html+=buildAudit();
-}
+ }
 
-document.getElementById("app").innerHTML=html;
+ if(view=="audit"){
+  html="<h3>Progress</h3>";
+
+  for(let d in workouts){
+   workouts[d].forEach(ex=>{
+    let sets=logs[d]?.[ex]||[];
+    if(sets.length){
+     let last=sets[sets.length-1];
+
+     if(last.speed){
+      html+=`<div class="small">${ex}: ${last.speed} mph / ${last.incline}%</div>`;
+     } else {
+      html+=`<div class="small">${ex}: ${last.weight} x ${last.reps}</div>`;
+     }
+    }
+   });
+  }
+
+ }
+
+ document.getElementById("app").innerHTML=html;
 }
 
 render();
 
 </script>
-
 </body>
 </html>
