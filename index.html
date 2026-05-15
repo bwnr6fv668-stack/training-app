@@ -1,5 +1,4 @@
-
-!DOCTYPE html>
+<!DOCTYPE html>
 <html>
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -37,11 +36,20 @@ button {
 .best { color:green; font-weight:bold; font-size:12px; }
 .controls { display:flex; gap:10px; margin-top:5px; }
 .controls div { flex:1; }
+
 .audit-card {
   background:white;
   padding:8px;
   border-radius:8px;
   margin-bottom:8px;
+}
+
+.info-box {
+  font-size:12px;
+  background:#eef3ff;
+  padding:6px;
+  border-radius:6px;
+  margin-top:5px;
 }
 </style>
 
@@ -68,7 +76,6 @@ const WORKOUT_DAYS = {
     "Lateral Raise",
     "Triceps Pressdown"
   ],
-
   "Day 2": [
     "Goblet Squat to Box",
     "Romanian Deadlift",
@@ -76,12 +83,10 @@ const WORKOUT_DAYS = {
     "Hip Thrust / Glute Bridge",
     "Pallof Press"
   ],
-
   "Day 3": [
     "Incline Treadmill Walk",
     "Kettlebell Swing"
   ],
-
   "Day 4": [
     "Chest‑Supported DB Row",
     "Neutral‑Grip Pulldown",
@@ -89,7 +94,6 @@ const WORKOUT_DAYS = {
     "Hammer Curl",
     "Farmer’s Carry"
   ],
-
   "Day 5": [
     "Complex – Deadlift",
     "Complex – Bent‑Over Row",
@@ -100,18 +104,27 @@ const WORKOUT_DAYS = {
   ]
 };
 
+const EXERCISE_INFO = {
+  "Incline DB Bench (Neutral Grip)": {
+    instructions: "Keep elbows slightly tucked, control the descent, press smoothly.",
+    video: "https://www.youtube.com/watch?v=8iPEnn-ltC8"
+  },
+  "Romanian Deadlift": {
+    instructions: "Push hips back, slight knee bend, keep bar close to legs.",
+    video: "https://www.youtube.com/watch?v=jc1ogzTe1cA"
+  },
+  "Incline Treadmill Walk": {
+    instructions: "Maintain tall posture, steady pace, breathe rhythmically.",
+    video: ""
+  }
+};
+
 let logs = JSON.parse(localStorage.getItem("logs") || "{}");
 
 let view = "workout";
 let currentDay = "Day 1";
 
-let current = {
-  weight:100,
-  reps:8,
-  rpe:8,
-  speed:3.0,
-  incline:5
-};
+let current = { weight:100, reps:8, rpe:8, speed:3.0, incline:5 };
 
 function save(){ localStorage.setItem("logs",JSON.stringify(logs)); }
 
@@ -134,12 +147,7 @@ function logSet(ex){
   if(isCardio(ex)){
     entry={ speed:current.speed, incline:current.incline };
   } else {
-    entry={
-      weight:current.weight,
-      reps:current.reps,
-      rpe:current.rpe,
-      score:current.weight*current.reps
-    };
+    entry={ weight:current.weight, reps:current.reps, rpe:current.rpe, score:current.weight*current.reps };
   }
 
   logs[currentDay][ex].push(entry);
@@ -155,30 +163,25 @@ function deleteSet(ex,i){
 }
 
 function editSet(ex,i){
-
   let s=logs[currentDay][ex][i];
 
   if(isCardio(ex)){
     let speed=prompt("Speed",s.speed);
     let incline=prompt("Incline",s.incline);
-
     logs[currentDay][ex][i]={ speed:+speed, incline:+incline };
-
   } else {
     let weight=prompt("Weight",s.weight);
     let reps=prompt("Reps",s.reps);
     let rpe=prompt("RPE",s.rpe);
-
-    logs[currentDay][ex][i]={
-      weight:+weight,
-      reps:+reps,
-      rpe:+rpe,
-      score:weight*reps
-    };
+    logs[currentDay][ex][i]={ weight:+weight, reps:+reps, rpe:+rpe, score:weight*reps };
   }
 
-  save();
-  render();
+  save(); render();
+}
+
+function getLast(ex){
+  let sets=logs[currentDay]?.[ex]||[];
+  return sets.length?sets[sets.length-1]:null;
 }
 
 function getBest(ex){
@@ -187,157 +190,106 @@ function getBest(ex){
   return sets.reduce((a,b)=>a.score>b.score?a:b);
 }
 
-function getLast(ex){
-  let sets=logs[currentDay]?.[ex]||[];
-  return sets.length?sets[sets.length-1]:null;
+function toggleInfo(id){
+  let el=document.getElementById(id);
+  el.style.display = el.style.display === "none" ? "block" : "none";
 }
 
 function buildAudit(){
   let output="";
-
   for(let d in WORKOUT_DAYS){
     WORKOUT_DAYS[d].forEach(ex=>{
+
       let sets=logs[d]?.[ex]||[];
-
       if(sets.length){
-
-        if(d==="Day 3"){
-          let last=sets[sets.length-1];
-          if(last.speed){
-            output+=`
-            <div class="audit-card">
-            <b>${ex}</b> (${d})<br>
-            ${last.speed} mph | ${last.incline}%
-            </div>`;
-          } else {
-            let best=sets.reduce((a,b)=>a.score>b.score?a:b);
-            output+=`
-            <div class="audit-card">
-            <b>${ex}</b> (${d})<br>
-            ${best.weight} x ${best.reps}
-            </div>`;
-          }
+        let best=sets[sets.length-1];
+        if(best.speed){
+          output+=`<div class="audit-card"><b>${ex}</b><br>${best.speed} mph | ${best.incline}%</div>`;
         } else {
-          let best=sets.reduce((a,b)=>a.score>b.score?a:b);
-          output+=`
-          <div class="audit-card">
-          <b>${ex}</b> (${d})<br>
-          ${best.weight} x ${best.reps} → ${best.score}
-          </div>`;
+          best=sets.reduce((a,b)=>a.score>b.score?a:b);
+          output+=`<div class="audit-card"><b>${ex}</b><br>${best.weight} x ${best.reps}</div>`;
         }
-
       }
     });
   }
-
   return output;
 }
 
 function render(){
 
-  let html="";
+let html="";
 
-  if(view==="workout"){
+if(view==="workout"){
 
-    for(let d in WORKOUT_DAYS){
-      html+=`<button onclick="currentDay='${d}';render()">${d}</button>`;
+  for(let d in WORKOUT_DAYS){
+    html+=`<button onclick="currentDay='${d}';render()">${d}</button>`;
+  }
+
+  WORKOUT_DAYS[currentDay].forEach(ex=>{
+
+    let id = ex.replace(/[^a-zA-Z0-9]/g,"");
+
+    html+=`<div class="card">
+    <b>${ex}</b>
+    <button onclick="toggleInfo('${id}')">ⓘ</button>`;
+
+    if(EXERCISE_INFO[ex]){
+      html+=`<div id="${id}" class="info-box" style="display:none">
+        ${EXERCISE_INFO[ex].instructions || ""}
+        ${EXERCISE_INFO[ex].video ? `<br><a href="${EXERCISE_INFO[ex].video}" target="_blank   </div>`;
     }
 
-    WORKOUT_DAYS[currentDay].forEach(ex=>{
-
-      html+=`<div class="card"><b>${ex}</b>`;
-
-      let last=getLast(ex);
-
-      if(last){
-        if(isCardio(ex)){
-          html+=`<div class="small">Last: ${last.speed} mph | ${last.incline}%</div>`;
-        } else if(last.weight){
-          html+=`<div class="small">Last: ${last.weight} x ${last.reps}</div>`;
-        }
-      }
-
-      if(isCardio(ex)){
-
-        html+=`
-        <div class="controls">
-          <div>
-          Speed: ${current.speed}<br>
-          <button onclick="adjust('speed',0.1)">+0.1</button>
-          <button onclick="adjust('speed',-0.1)">-0.1</button>
-          </div>
-
-          <div>
-          Incline: ${current.incline}<br>
-          <button onclick="adjust('incline',1)">+1</button>
-          <button onclick="adjust('incline',-1)">-1</button>
-          </div>
-        </div>
-        `;
-
+    let last=getLast(ex);
+    if(last){
+      if(last.speed){
+        html+=`<div class="small">Last: ${last.speed} mph | ${last.incline}%</div>`;
       } else {
-
-        html+=`
-        <div class="controls">
-          <div>
-          W:${current.weight}<br>
-          <button onclick="adjust('weight',5)">+5</button>
-          <button onclick="adjust('weight',-5)">-5</button>
-          </div>
-
-          <div>
-          R:${current.reps}<br>
-          <button onclick="adjust('reps',1)">+1</button>
-          <button onclick="adjust('reps',-1)">-1</button>
-          </div>
-
-          <div>
-          RPE:<br>
-          ${[6,7,8,9].map(r=>`<button onclick="current.rpe=${r};render()">${r}</button>`).join("")}
-          </div>
-        </div>
-        `;
+        html+=`<div class="small">Last: ${last.weight} x ${last.reps}</div>`;
       }
+    }
 
-      html+=`<button onclick="logSet('${ex}')">✅ Log</button>`;
+    if(isCardio(ex)){
+      html+=`
+      <div class="controls">
+        <div>Speed:${current.speed}<br><button onclick="adjust('speed',0.1)">+0.1</button><button onclick="adjust('speed',-0.1)">-0.1</button></div>
+        <div>Incline:${current.incline}<br><button onclick="adjust('incline',1)">+1</button><button onclick="adjust('incline',-1)">-1</button></div>
+      </div>`;
+    } else {
+      html+=`
+      <div class="controls">
+        <div>W:${current.weight}<br><button onclick="adjust('weight',5)">+5</button><button onclick="adjust('weight',-5)">-5</button></div>
+        <div>R:${current.reps}<br><button onclick="adjust('reps',1)">+1</button><button onclick="adjust('reps',-1)">-1</button></div>
+        <div>RPE:<br>${[6,7,8,9].map(r=>`<button onclick="current.rpe=${r};render()">${r}</button>`).join("")}</div>
+      </div>`;
+    }
 
-      let sets=logs[currentDay]?.[ex]||[];
+    html+=`<button onclick="logSet('${ex}')">✅ Log</button>`;
 
-      sets.forEach((s,i)=>{
+    let sets=logs[currentDay]?.[ex]||[];
 
-        if(isCardio(ex)){
-          html+=`
-          <div class="small">
-          ${s.speed} mph | ${s.incline}%
-          <button onclick="editSet('${ex}',${i})">✏️</button>
-          <button onclick="deleteSet('${ex}',${i})">🗑️</button>
-          </div>`;
-        } else {
-          html+=`
-          <div class="small">
-          ${s.weight} x ${s.reps} → ${s.score}
-          <button onclick="editSet('${ex}',${i})">✏️</button>
-          <button onclick="deleteSet('${ex}',${i})">🗑️</button>
-          </div>`;
-        }
-
-      });
-
-      let best=getBest(ex);
-      if(best){
-        html+=`<div class="best">Best: ${best.weight} x ${best.reps}</div>`;
+    sets.forEach((s,i)=>{
+      if(s.speed){
+        html+=`<div class="small">${s.speed} mph | ${s.incline}% <button onclick="editSet('${ex}',${i})">✏️</button><button onclick="deleteSet('${ex}',${i})">🗑️</button></div>`;
+      } else {
+        html+=`<div class="small">${s.weight} x ${s.reps}<button onclick="editSet('${ex}',${i})">✏️</button><button onclick="deleteSet('${ex}',${i})">🗑️</button></div>`;
       }
-
-      html+=`</div>`;
     });
-  }
 
-  if(view==="audit"){
-    html+=`<h3>Strength Audit</h3>`;
-    html+=buildAudit();
-  }
+    let best=getBest(ex);
+    if(best){
+      html+=`<div class="best">Best: ${best.weight} x ${best.reps}</div>`;
+    }
 
-  document.getElementById("app").innerHTML=html;
+    html+=`</div>`;
+  });
+}
+
+if(view==="audit"){
+  html+=`<h3>Strength Audit</h3>`;
+  html+=buildAudit();
+}
+
+document.getElementById("app").innerHTML=html;
 }
 
 render();
