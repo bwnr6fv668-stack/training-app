@@ -13,16 +13,16 @@ body {
   background: #f5f7fb;
 }
 
-h2 { text-align: center; }
+h2 { text-align:center; }
 
 button {
-  border: none;
-  border-radius: 6px;
-  padding: 6px 8px;
-  margin: 3px;
-  background: #2563eb;
-  color: white;
-  font-size: 13px;
+  border:none;
+  border-radius:6px;
+  padding:6px 8px;
+  margin:3px;
+  background:#2563eb;
+  color:white;
+  font-size:13px;
 }
 
 .day-btn { background:#ddd; color:black; }
@@ -46,7 +46,7 @@ button {
 
 .info-box {
   background:#eef3ff;
-  padding:6px;
+  padding:8px;
   border-radius:6px;
   margin-top:6px;
 }
@@ -105,92 +105,115 @@ const workouts = {
 const info = {
 
 "Incline DB Bench (Neutral Grip)": {
-instructions:"Bench at ~30°. Neutral grip. Lower under control, slight elbow tuck, press through upper chest."
+ instructions:"Upper chest press with neutral grip.",
+ video:"https://www.youtube.com/watch?v=8iPEnn-ltC8"
 },
 
 "Half-Kneeling Landmine Press": {
-instructions:"Half kneeling stance. Brace core, press upward and slightly forward without leaning back."
+ instructions:"Single-arm press from kneeling position.",
+ video:"https://www.youtube.com/watch?v=H8kB1YI5l3M"
 },
 
 "DB Fly (Short Range)": {
-instructions:"Keep slight bend in arms. Lower only to comfortable stretch, squeeze chest at top."
+ instructions:"Controlled chest fly with limited range.",
+ video:"https://www.youtube.com/watch?v=eozdVDA78K0"
 },
 
 "Lateral Raise": {
-instructions:"Raise arms to shoulder height, lead with elbows, control the descent."
+ instructions:"Raise DBs to shoulder height.",
+ video:"https://www.youtube.com/watch?v=3VcKaXpzqRo"
 },
 
 "Triceps Pressdown": {
-instructions:"Elbows pinned to sides, extend fully, control back up slowly."
+ instructions:"Cable extension for triceps.",
+ video:"https://www.youtube.com/watch?v=2-LAMcpzODU"
 },
 
 "Goblet Squat to Box": {
-instructions:"Sit back to box, keep chest tall, drive through heels to stand."
+ instructions:"Sit back onto box, drive up.",
+ video:"https://www.youtube.com/watch?v=6xwGFn-J_Q8"
 },
 
 "Romanian Deadlift": {
-instructions:"Push hips back, slight knee bend, keep bar close, feel stretch in hamstrings."
+ instructions:"Hip hinge, stretch hamstrings.",
+ video:"https://www.youtube.com/watch?v=jc1ogzTe1cA"
 },
 
 "Reverse Lunge": {
-instructions:"Step back, drop knee toward floor, drive through front leg to stand."
+ instructions:"Step back and lower under control.",
+ video:"https://www.youtube.com/watch?v=wrwwXE_x-pQ"
 },
 
 "Hip Thrust / Glute Bridge": {
-instructions:"Drive hips upward, squeeze glutes at top, avoid arching lower back."
+ instructions:"Drive hips upward, squeeze glutes.",
+ video:"https://www.youtube.com/watch?v=LM8XHLYJoYs"
 },
 
 "Pallof Press": {
-instructions:"Press straight out from chest, resist rotation, keep core tight."
+ instructions:"Anti-rotation core exercise.",
+ video:"https://www.youtube.com/watch?v=2yx0_PK0Q-4"
 },
 
 "Incline Treadmill Walk": {
-instructions:"Maintain upright posture, steady pace, controlled breathing."
+ instructions:"Steady incline walking cardio.",
+ video:"https://www.youtube.com/watch?v=8XjJb6y0JX0"
 },
 
 "Kettlebell Swing": {
-instructions:"Hinge at hips, snap hips forward to drive bell, arms relaxed."
+ instructions:"Explosive hip hinge movement.",
+ video:"https://www.youtube.com/watch?v=YSxHifyI1lA"
 },
 
 "Chest-Supported DB Row": {
-instructions:"Chest on bench, pull elbows toward hips, squeeze shoulder blades."
+ instructions:"Row with chest support, isolate back.",
+ video:"https://www.youtube.com/watch?v=roCP6wCXPqo"
 },
 
 "Neutral-Grip Pulldown": {
-instructions:"Pull to upper chest, elbows down, control back up."
+ instructions:"Pull handles to chest.",
+ video:"https://www.youtube.com/watch?v=CAwf7n6Luuc"
 },
 
 "Face Pull": {
-instructions:"Pull toward face, elbows high, squeeze rear delts."
+ instructions:"Rear delt + upper back pull.",
+ video:"https://www.youtube.com/watch?v=rep-qVOkqgk"
 },
 
 "Hammer Curl": {
-instructions:"Neutral grip, control both up and down, no swinging."
+ instructions:"Neutral grip arm curl.",
+ video:"https://www.youtube.com/watch?v=zC3nLlEvin4"
 },
 
 "Farmer's Carry": {
-instructions:"Stand tall, shoulders packed, slow controlled steps."
+ instructions:"Carry heavy weights, stay upright.",
+ video:"https://www.youtube.com/watch?v=rt17lmnaLSM"
 },
 
 "Complex Deadlift": {
-instructions:"Maintain tight core, controlled lift, reset position each rep."
+ instructions:"Start complex with hinge.",
+ video:"https://www.youtube.com/watch?v=ytGaGIn3SjE"
 },
 
 "Complex Row": {
-instructions:"Hinge position, pull bar toward torso, control motion."
+ instructions:"Pull from hinge position.",
+ video:"https://www.youtube.com/watch?v=roCP6wCXPqo"
 },
 
 "Complex Clean": {
-instructions:"Explosive hip drive, catch smoothly, stay balanced."
+ instructions:"Explosive pull to shoulders.",
+ video:"https://www.youtube.com/watch?v=KwYJTpQ_x5A"
 },
 
 "Complex Front Squat": {
-instructions:"Elbows high, chest upright, drive knees out."
+ instructions:"Squat with front rack position.",
+ video:"https://www.youtube.com/watch?v=tlf3A60GHvE"
 },
 
 "Complex Push Press": {
-instructions:"Dip slightly then explode upward, press overhead."
+ instructions:"Dip then drive overhead.",
+ video:"https://www.youtube.com/watch?v=iaBVSJm78ko"
 }
+
 };
 
 let logs = JSON.parse(localStorage.getItem("logs") || "{}");
@@ -262,6 +285,10 @@ function render(){
     html+=`
     <div class="info-box">
       ${info[ex]?.instructions || "Instructions coming soon"}
+      ${info[ex]?.video
+        ? `<br><button onclick="window.open('${info[ex].video}','_blank')">▶ Watch Tutorial</button>`
+        : ""
+      }
     </div>`;
    }
 
@@ -279,16 +306,10 @@ function render(){
    if(isCardio(ex)){
     html+=`
     <div class="row"><span>Speed ${current.speed}</span>
-    <div>
-    <button onclick="adjust('speed',.1)">+</button>
-    <button onclick="adjust('speed',-.1)">-</button>
-    </div></div>
+    <div><button onclick="adjust('speed',.1)">+</button><button onclick="adjust('speed',-.1)">-</button></div></div>
 
     <div class="row"><span>Incline ${current.incline}</span>
-    <div>
-    <button onclick="adjust('incline',1)">+</button>
-    <button onclick="adjust('incline',-1)">-</button>
-    </div></div>
+    <div><button onclick="adjust('incline',1)">+</button><button onclick="adjust('incline',-1)">-</button></div></div>
     `;
    }
    else{
@@ -305,14 +326,12 @@ function render(){
    }
 
    html+=`<button onclick="logSet('${ex}')">Log</button>`;
-
    html+=`</div>`;
   });
  }
 
  if(view==="audit"){
   html="<h3>Progress</h3>";
-
   for(let d in workouts){
    workouts[d].forEach(ex=>{
     let last = logs[d]?.[ex]?.slice(-1)[0];
@@ -333,3 +352,4 @@ render();
 </script>
 </body>
 </html>
+``
