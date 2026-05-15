@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -44,12 +45,12 @@ button {
 }
 
 .row {
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
-.small { font-size:12px; color:#666; }
+.small { font-size: 12px; color:#666; }
 
 .info-box {
   background:#eef3ff;
@@ -113,14 +114,17 @@ const info = {
  "Incline DB Bench (Neutral Grip)": {
   instructions:"Control descent, slight elbow tuck, press through chest",
   video:"https://www.youtube.com/watch?v=8iPEnn-ltC8"
+ },
+ "Romanian Deadlift": {
+  instructions:"Push hips back, keep bar close, neutral spine",
+  video:"https://www.youtube.com/watch?v=jc1ogzTe1cA"
  }
 };
 
-let logs = JSON.parse(localStorage.getItem("logs") || "{}");
-
+let logs = JSON.parse(localStorage.getItem("logs") || {});
 let currentDay="Day 1";
 let view="workout";
-let openInfo = null;
+let openInfo=null;
 
 let current = {
  weight:100,
@@ -144,12 +148,13 @@ function isCardio(ex){
 }
 
 function logSet(ex){
+
  if(!logs[currentDay]) logs[currentDay]={};
  if(!logs[currentDay][ex]) logs[currentDay][ex]=[];
 
  let entry = isCardio(ex)
  ? {speed:current.speed,incline:current.incline}
- : {weight:current.weight,reps:current.reps};
+ : {weight:current.weight,reps:current.reps,rpe:current.rpe};
 
  logs[currentDay][ex].push(entry);
  save();
@@ -162,7 +167,7 @@ function render(){
 
  if(view==="workout"){
 
-  // Days row
+  // days
   for(let d in workouts){
    html+=`<button class="day-btn ${d===currentDay?'active':''}" onclick="currentDay='${d}';render()">${d}</button>`;
   }
@@ -171,19 +176,22 @@ function render(){
 
    html+=`<div class="card">`;
 
-   // header row
    html+=`
    <div class="row">
     <b>${ex}</b>
     <button onclick="openInfo='${ex}';render()">ⓘ</button>
    </div>`;
 
-   // info section
+   // ✅ INFO BOX
    if(openInfo===ex && info[ex]){
     html+=`
     <div class="info-box">
       ${info[ex].instructions}
-      ${info[ex].video ? `<br><a href="${info[ex].video}">`:""}
+
+      ${info[ex].video
+        ? `<br><button onclick="window.open('${info[ex].video}','_blank')">▶ Watch</button>`
+        : ""
+      }
     </div>`;
    }
 
@@ -191,14 +199,14 @@ function render(){
 
    if(last){
     html+=`<div class="small">
-      ${last.speed 
+      ${last.speed
         ? `${last.speed} mph / ${last.incline}%`
-        : `${last.weight} x ${last.reps}`
+        : `${last.weight} x ${last.reps} (RPE ${last.rpe || "-"})`
       }
     </div>`;
    }
 
-   // Controls
+   // ✅ CONTROLS
    if(isCardio(ex)){
     html+=`
     <div class="row">
@@ -236,6 +244,15 @@ function render(){
         <button onclick="adjust('reps',-1)">-</button>
       </div>
     </div>
+
+    <div class="row">
+      <span>RPE</span>
+      <div>
+        ${[6,7,8,9].map(r =>
+          `<button onclick="current.rpe=${r};render()">${r}</button>`
+        ).join("")}
+      </div>
+    </div>
     `;
    }
 
@@ -244,11 +261,14 @@ function render(){
    let sets = logs[currentDay]?.[ex] || [];
    sets.forEach(s=>{
     html+=`<div class="small">
-    ${s.speed ? `${s.speed}/${s.incline}` : `${s.weight}x${s.reps}`}
+      ${s.speed
+        ? `${s.speed}/${s.incline}`
+        : `${s.weight}x${s.reps} (RPE ${s.rpe || "-"})`
+      }
     </div>`;
    });
 
-   html+=`</div>`;
+   html+="</div>";
   });
  }
 
@@ -259,9 +279,12 @@ function render(){
    workouts[d].forEach(ex=>{
     let last=logs[d]?.[ex]?.slice(-1)[0];
     if(last){
-     html+=`<div class="small">
-     ${ex}: ${last.speed ? `${last.speed}/${last.incline}` : `${last.weight}x${last.reps}`}
-     </div>`;
+      html+=`<div class="small">
+      ${ex}: ${last.speed
+        ? `${last.speed}/${last.incline}`
+        : `${last.weight}x${last.reps}`
+      }
+      </div>`;
     }
    });
   }
