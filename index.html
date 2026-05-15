@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -6,26 +7,74 @@
 
 <style>
 body {
-  font-family: Arial;
-  padding: 10px;
+  font-family: -apple-system, Arial, sans-serif;
+  padding: 12px;
   max-width: 500px;
   margin: auto;
+  background: #f7f7f7;
+}
+
+h2 {
+  text-align: center;
 }
 
 button {
+  border: none;
+  border-radius: 6px;
+  padding: 8px 10px;
   margin: 3px;
-  padding: 6px;
+  background: #2d6cdf;
+  color: white;
+  font-size: 14px;
+}
+
+button:active {
+  transform: scale(0.95);
+}
+
+.tab {
+  background: #ddd;
+  color: black;
 }
 
 .card {
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  padding: 8px;
-  margin-bottom: 10px;
+  background: white;
+  border-radius: 10px;
+  padding: 10px;
+  margin-bottom: 12px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
 }
 
 .small {
   font-size: 12px;
+  color: #666;
+}
+
+.best {
+  color: green;
+  font-weight: bold;
+  font-size: 12px;
+}
+
+.section {
+  margin-top: 6px;
+}
+
+.controls {
+  display: flex;
+  gap: 10px;
+  margin-top: 6px;
+}
+
+.controls div {
+  flex: 1;
+}
+
+.audit-card {
+  background: white;
+  border-radius: 8px;
+  padding: 8px;
+  margin-bottom: 8px;
 }
 </style>
 
@@ -33,11 +82,11 @@ button {
 
 <body>
 
-<h2>Training App</h2>
+<h2>🏋️ Training App</h2>
 
 <div>
-  <button onclick="view='workout'; render()">Workout</button>
-  <button onclick="view='audit'; render()">Audit</button>
+  <button class="tab" onclick="view='workout'; render()">Workout</button>
+  <button class="tab" onclick="view='audit'; render()">Audit</button>
 </div>
 
 <div id="app"></div>
@@ -130,14 +179,14 @@ function getLast(ex) {
 function buildAudit() {
   let output = "";
 
-  for (let day in WORKOUT_DAYS) {
-    WORKOUT_DAYS[day].forEach(ex => {
-      let sets = logs[day]?.[ex] || [];
+  for (let d in WORKOUT_DAYS) {
+    WORKOUT_DAYS[d].forEach(ex => {
+      let sets = logs[d]?.[ex] || [];
       if (sets.length) {
         let best = sets.reduce((a,b)=>a.score>b.score?a:b);
         output += `
-          <div class="small">
-            <b>${ex}</b> (${day})<br>
+          <div class="audit-card">
+            <b>${ex}</b> (${d})<br>
             ${best.weight} x ${best.reps} → ${best.score}
           </div>
         `;
@@ -153,12 +202,10 @@ function render() {
 
   if (view === "workout") {
 
-    html += `<div>`;
-
+    html += `<div class="section">`;
     for (let d in WORKOUT_DAYS) {
-      html += `<button onclick="currentDay='${d}';render()">${d}</button>`;
+      html += `<button class="tab" onclick="currentDay='${d}';render()">${d}</button>`;
     }
-
     html += `</div>`;
 
     WORKOUT_DAYS[currentDay].forEach(ex => {
@@ -169,27 +216,29 @@ function render() {
 
       let last = getLast(ex);
       if (last) {
-        html += `<div class="small">Last: ${last.weight} x ${last.reps}</div>`;
+        html += `<div class="small">Last: ${last.weight} x ${last.reps} (RPE ${last.rpe})</div>`;
       }
 
       html += `
-        <div>
-          W:${current.weight}
-          <button onclick="adjust('weight',5)">+5</button>
-          <button onclick="adjust('weight',-5)">-5</button>
-        </div>
+        <div class="controls">
+          <div>
+            W:${current.weight}<br>
+            <button onclick="adjust('weight',5)">+5</button>
+            <button onclick="adjust('weight',-5)">-5</button>
+          </div>
 
-        <div>
-          R:${current.reps}
-          <button onclick="adjust('reps',1)">+1</button>
-          <button onclick="adjust('reps',-1)">-1</button>
-        </div>
+          <div>
+            R:${current.reps}<br>
+            <button onclick="adjust('reps',1)">+1</button>
+            <button onclick="adjust('reps',-1)">-1</button>
+          </div>
 
-        <div>
-          RPE:
-          ${[6,7,8,9].map(r => 
-            `<button onclick="current.rpe=${r};render()">${r}</button>`
-          ).join("")}
+          <div>
+            RPE:<br>
+            ${[6,7,8,9].map(r =>
+              `<button onclick="current.rpe=${r};render()">${r}</button>`
+            ).join("")}
+          </div>
         </div>
 
         <button onclick="logSet('${ex}')">✅ Log</button>
@@ -209,7 +258,7 @@ function render() {
 
       let best = getBest(ex);
       if (best) {
-        html += `<div class="small" style="color:green">
+        html += `<div class="best">
           Best: ${best.weight} x ${best.reps}
         </div>`;
       }
