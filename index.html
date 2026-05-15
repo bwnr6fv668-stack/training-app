@@ -7,57 +7,114 @@
 <style>
 body {
   font-family: -apple-system, Arial;
-  max-width: 500px;
+  background: #f2f4f7;
+  margin: 0;
+  padding: 10px;
+  max-width: 480px;
   margin: auto;
-  padding: 12px;
-  background: #f5f7fb;
 }
 
-h2 { text-align:center; }
+h2 {
+  text-align: center;
+  margin-bottom: 10px;
+}
 
 button {
-  border:none;
-  border-radius:6px;
-  padding:6px 8px;
-  margin:3px;
-  background:#2563eb;
-  color:white;
-  font-size:13px;
+  border: none;
+  border-radius: 8px;
+  padding: 10px;
+  margin: 4px;
+  font-size: 14px;
+  background: #2563eb;
+  color: white;
 }
 
-.day-btn { background:#ddd; color:black; }
-.active { background:#2563eb; color:white; }
+button:active { transform: scale(0.96); }
+
+.top-buttons {
+  display: flex;
+  justify-content: space-around;
+  margin-bottom: 12px;
+}
+
+.day-row {
+  display: flex;
+  overflow-x: auto;
+  margin-bottom: 10px;
+}
+
+.day-btn {
+  background: #ddd;
+  color: black;
+}
+
+.active {
+  background: #2563eb;
+  color: white;
+}
 
 .card {
-  background:white;
-  border-radius:10px;
-  padding:10px;
-  margin-bottom:10px;
-  box-shadow:0 2px 6px rgba(0,0,0,0.1);
+  background: white;
+  border-radius: 14px;
+  padding: 12px;
+  margin-bottom: 12px;
+  box-shadow: 0 6px 14px rgba(0,0,0,0.07);
 }
 
-.row {
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
+.title-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
-.small { font-size:12px; color:#666; }
+.small {
+  font-size: 12px;
+  color: #777;
+  margin-top: 4px;
+}
+
+.controls {
+  margin-top: 10px;
+}
+
+.control-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 6px;
+}
+
+.rpe-btn {
+  background: #ddd;
+  color: black;
+}
+
+.rpe-active {
+  background: #2563eb;
+  color: white;
+}
 
 .info-box {
-  background:#eef3ff;
-  padding:8px;
-  border-radius:6px;
-  margin-top:6px;
+  background: #eef3ff;
+  padding: 10px;
+  border-radius: 10px;
+  margin-top: 10px;
+}
+
+.video {
+  width: 100%;
+  margin-top: 8px;
+  border-radius: 10px;
 }
 </style>
 
 </head>
+
 <body>
 
 <h2>🏋️ Training</h2>
 
-<div>
+<div class="top-buttons">
 <button onclick="view='workout';render()">Workout</button>
 <button onclick="view='audit';render()">Audit</button>
 </div>
@@ -102,118 +159,28 @@ const workouts = {
  ]
 };
 
+// ✅ Embedded videos (YouTube embed URLs)
 const info = {
-
-"Incline DB Bench (Neutral Grip)": {
- instructions:"Upper chest press with neutral grip.",
- video:"https://www.youtube.com/watch?v=8iPEnn-ltC8"
-},
-
-"Half-Kneeling Landmine Press": {
- instructions:"Single-arm press from kneeling position.",
- video:"https://www.youtube.com/watch?v=H8kB1YI5l3M"
-},
-
-"DB Fly (Short Range)": {
- instructions:"Controlled chest fly with limited range.",
- video:"https://www.youtube.com/watch?v=eozdVDA78K0"
-},
-
-"Lateral Raise": {
- instructions:"Raise DBs to shoulder height.",
- video:"https://www.youtube.com/watch?v=3VcKaXpzqRo"
-},
-
-"Triceps Pressdown": {
- instructions:"Cable extension for triceps.",
- video:"https://www.youtube.com/watch?v=2-LAMcpzODU"
-},
-
-"Goblet Squat to Box": {
- instructions:"Sit back onto box, drive up.",
- video:"https://www.youtube.com/watch?v=6xwGFn-J_Q8"
-},
-
-"Romanian Deadlift": {
- instructions:"Hip hinge, stretch hamstrings.",
- video:"https://www.youtube.com/watch?v=jc1ogzTe1cA"
-},
-
-"Reverse Lunge": {
- instructions:"Step back and lower under control.",
- video:"https://www.youtube.com/watch?v=wrwwXE_x-pQ"
-},
-
-"Hip Thrust / Glute Bridge": {
- instructions:"Drive hips upward, squeeze glutes.",
- video:"https://www.youtube.com/watch?v=LM8XHLYJoYs"
-},
-
-"Pallof Press": {
- instructions:"Anti-rotation core exercise.",
- video:"https://www.youtube.com/watch?v=2yx0_PK0Q-4"
-},
-
-"Incline Treadmill Walk": {
- instructions:"Steady incline walking cardio.",
- video:"https://www.youtube.com/watch?v=8XjJb6y0JX0"
-},
-
-"Kettlebell Swing": {
- instructions:"Explosive hip hinge movement.",
- video:"https://www.youtube.com/watch?v=YSxHifyI1lA"
-},
-
-"Chest-Supported DB Row": {
- instructions:"Row with chest support, isolate back.",
- video:"https://www.youtube.com/watch?v=roCP6wCXPqo"
-},
-
-"Neutral-Grip Pulldown": {
- instructions:"Pull handles to chest.",
- video:"https://www.youtube.com/watch?v=CAwf7n6Luuc"
-},
-
-"Face Pull": {
- instructions:"Rear delt + upper back pull.",
- video:"https://www.youtube.com/watch?v=rep-qVOkqgk"
-},
-
-"Hammer Curl": {
- instructions:"Neutral grip arm curl.",
- video:"https://www.youtube.com/watch?v=zC3nLlEvin4"
-},
-
-"Farmer's Carry": {
- instructions:"Carry heavy weights, stay upright.",
- video:"https://www.youtube.com/watch?v=rt17lmnaLSM"
-},
-
-"Complex Deadlift": {
- instructions:"Start complex with hinge.",
- video:"https://www.youtube.com/watch?v=ytGaGIn3SjE"
-},
-
-"Complex Row": {
- instructions:"Pull from hinge position.",
- video:"https://www.youtube.com/watch?v=roCP6wCXPqo"
-},
-
-"Complex Clean": {
- instructions:"Explosive pull to shoulders.",
- video:"https://www.youtube.com/watch?v=KwYJTpQ_x5A"
-},
-
-"Complex Front Squat": {
- instructions:"Squat with front rack position.",
- video:"https://www.youtube.com/watch?v=tlf3A60GHvE"
-},
-
-"Complex Push Press": {
- instructions:"Dip then drive overhead.",
- video:"https://www.youtube.com/watch?v=iaBVSJm78ko"
-}
-
+ "Incline DB Bench (Neutral Grip)": {
+  instructions:"Upper chest press with neutral grip.",
+  video:"https://www.youtube.com/embed/8iPEnn-ltC8"
+ },
+ "Romanian Deadlift": {
+  instructions:"Hip hinge, stretch hamstrings.",
+  video:"https://www.youtube.com/embed/jc1ogzTe1cA"
+ },
+ "Kettlebell Swing": {
+  instructions:"Explosive hip hinge.",
+  video:"https://www.youtube.com/embed/YSxHifyI1lA"
+ },
+ "Lateral Raise": {
+  instructions:"Raise arms to shoulder height.",
+  video:"https://www.youtube.com/embed/3VcKaXpzqRo"
+ },
+ "Face Pull": {
+  instructions:"Rear delts + upper back.",
+  video:"https://www.youtube.com/embed/rep-qVOkqgk"
+ }
 };
 
 let logs = JSON.parse(localStorage.getItem("logs") || "{}");
@@ -230,7 +197,7 @@ let current = {
 };
 
 function toggleInfo(ex){
- openInfo = openInfo === ex ? null : ex;
+ openInfo = (openInfo === ex) ? null : ex;
  render();
 }
 
@@ -249,6 +216,7 @@ function isCardio(ex){
 }
 
 function logSet(ex){
+
  if(!logs[currentDay]) logs[currentDay]={};
  if(!logs[currentDay][ex]) logs[currentDay][ex]=[];
 
@@ -257,7 +225,9 @@ function logSet(ex){
  : {weight:current.weight,reps:current.reps,rpe:current.rpe};
 
  logs[currentDay][ex].push(entry);
+
  localStorage.setItem("logs", JSON.stringify(logs));
+
  render();
 }
 
@@ -267,26 +237,32 @@ function render(){
 
  if(view==="workout"){
 
+  html += `<div class="day-row">`;
+
   for(let d in workouts){
    html+=`<button class="day-btn ${d===currentDay?'active':''}" onclick="setDay('${d}')">${d}</button>`;
   }
+
+  html += `</div>`;
 
   workouts[currentDay].forEach(ex=>{
 
    html+=`<div class="card">`;
 
    html+=`
-   <div class="row">
+   <div class="title-row">
     <b>${ex}</b>
     <button onclick="toggleInfo('${ex}')">ⓘ</button>
-   </div>`;
+   </div>
+   `;
 
    if(openInfo===ex){
     html+=`
     <div class="info-box">
       ${info[ex]?.instructions || "Instructions coming soon"}
+      
       ${info[ex]?.video
-        ? `<br><button onclick="window.open('${info[ex].video}','_blank')">▶ Watch Tutorial</button>`
+        ? `${info[ex].video}</iframe>`
         : ""
       }
     </div>`;
@@ -295,49 +271,85 @@ function render(){
    let last = logs[currentDay]?.[ex]?.slice(-1)[0];
 
    if(last){
-    html+=`<div class="small">
-      ${last.speed
+    html+=`
+    <div class="small">
+      Last: ${
+        last.speed
         ? `${last.speed} mph / ${last.incline}%`
         : `${last.weight} x ${last.reps} (RPE ${last.rpe || "-"})`
       }
     </div>`;
    }
 
+   html += `<div class="controls">`;
+
    if(isCardio(ex)){
     html+=`
-    <div class="row"><span>Speed ${current.speed}</span>
-    <div><button onclick="adjust('speed',.1)">+</button><button onclick="adjust('speed',-.1)">-</button></div></div>
+    <div class="control-row">
+      Speed ${current.speed}
+      <div>
+        <button onclick="adjust('speed',.1)">+</button>
+        <button onclick="adjust('speed',-.1)">-</button>
+      </div>
+    </div>
 
-    <div class="row"><span>Incline ${current.incline}</span>
-    <div><button onclick="adjust('incline',1)">+</button><button onclick="adjust('incline',-1)">-</button></div></div>
+    <div class="control-row">
+      Incline ${current.incline}
+      <div>
+        <button onclick="adjust('incline',1)">+</button>
+        <button onclick="adjust('incline',-1)">-</button>
+      </div>
+    </div>
     `;
-   }
-   else{
+   } else {
+
     html+=`
-    <div class="row"><span>Weight ${current.weight}</span>
-    <div><button onclick="adjust('weight',5)">+</button><button onclick="adjust('weight',-5)">-</button></div></div>
+    <div class="control-row">
+      Weight ${current.weight}
+      <div>
+        <button onclick="adjust('weight',5)">+</button>
+        <button onclick="adjust('weight',-5)">-</button>
+      </div>
+    </div>
 
-    <div class="row"><span>Reps ${current.reps}</span>
-    <div><button onclick="adjust('reps',1)">+</button><button onclick="adjust('reps',-1)">-</button></div></div>
+    <div class="control-row">
+      Reps ${current.reps}
+      <div>
+        <button onclick="adjust('reps',1)">+</button>
+        <button onclick="adjust('reps',-1)">-</button>
+      </div>
+    </div>
 
-    <div class="row"><span>RPE</span>
-    <div>${[6,7,8,9].map(r=>`<button onclick="current.rpe=${r};render()">${r}</button>`).join("")}</div></div>
+    <div class="control-row">
+      RPE
+      <div>
+        ${[6,7,8,9].map(r=>
+          `<button onclick="current.rpe=${r};render()" class="${current.rpe===r?'rpe-active':'rpe-btn'}">${r}</button>`
+        ).join("")}
+      </div>
+    </div>
     `;
    }
 
-   html+=`<button onclick="logSet('${ex}')">Log</button>`;
-   html+=`</div>`;
+   html += `</div>`;
+
+   html += `<button onclick="logSet('${ex}')">Log Set</button>`;
+
+   html += `</div>`;
   });
  }
 
  if(view==="audit"){
-  html="<h3>Progress</h3>";
+  html = "<h3>Progress</h3>";
+
   for(let d in workouts){
    workouts[d].forEach(ex=>{
     let last = logs[d]?.[ex]?.slice(-1)[0];
     if(last){
-      html+=`<div class="small">${ex}: ${
-        last.speed ? `${last.speed}/${last.incline}` : `${last.weight}x${last.reps}`
+      html += `<div class="small">${ex}: ${
+        last.speed
+        ? `${last.speed}/${last.incline}`
+        : `${last.weight}x${last.reps}`
       }</div>`;
     }
    });
@@ -350,6 +362,6 @@ function render(){
 render();
 
 </script>
+
 </body>
 </html>
-``
