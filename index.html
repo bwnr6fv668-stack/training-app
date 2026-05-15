@@ -8,22 +8,24 @@
 body {
   font-family: -apple-system, Arial;
   background: #f2f4f7;
-  margin: 0;
   padding: 10px;
   max-width: 480px;
   margin: auto;
 }
 
-h2 { text-align:center; }
+h2 {
+  text-align:center;
+  margin-bottom:10px;
+}
 
 button {
   border:none;
   border-radius:8px;
-  padding:10px;
-  margin:4px;
-  font-size:14px;
+  padding:8px;
+  margin:3px;
   background:#2563eb;
   color:white;
+  font-size:14px;
 }
 
 .card {
@@ -34,104 +36,98 @@ button {
   box-shadow:0 4px 10px rgba(0,0,0,0.08);
 }
 
-.title-row {
+.row {
   display:flex;
   justify-content:space-between;
+  align-items:center;
 }
 
 .small {
   font-size:12px;
   color:#777;
-  margin-top:4px;
-}
-
-.controls { margin-top:8px; }
-
-.control-row {
-  display:flex;
-  justify-content:space-between;
-  margin-top:5px;
 }
 
 .video {
   width:100%;
-  margin-top:10px;
-  border-radius:10px;
-}
-
-.active { background:#2563eb; color:white; }
-.day-btn { background:#ddd; color:black; }
-
-.info-box {
-  background:#eef3ff;
-  padding:8px;
-  border-radius:8px;
   margin-top:8px;
+  border-radius:8px;
 }
 </style>
-
 </head>
+
 <body>
 
 <h2>🏋️ Training</h2>
 
-<div>
-<button onclick="view='workout';render()">Workout</button>
-<button onclick="view='audit';render()">Audit</button>
-</div>
-
+<div id="top"></div>
 <div id="app"></div>
 
 <script>
 
 const workouts = {
- "Day 1":["Incline DB Bench (Neutral Grip)","Half-Kneeling Landmine Press","DB Fly (Short Range)","Lateral Raise","Triceps Pressdown"],
- "Day 2":["Goblet Squat to Box","Romanian Deadlift","Reverse Lunge","Hip Thrust / Glute Bridge","Pallof Press"],
- "Day 3":["Incline Treadmill Walk","Kettlebell Swing"],
- "Day 4":["Chest-Supported DB Row","Neutral-Grip Pulldown","Face Pull","Hammer Curl","Farmer's Carry"],
- "Day 5":["Complex Deadlift","Complex Row","Complex Clean","Complex Front Squat","Complex Push Press","Kettlebell Swing"]
+ "Day 1":[
+  "Incline DB Bench (Neutral Grip)",
+  "Half-Kneeling Landmine Press",
+  "DB Fly (Short Range)",
+  "Lateral Raise",
+  "Triceps Pressdown"
+ ],
+ "Day 2":[
+  "Goblet Squat to Box",
+  "Romanian Deadlift",
+  "Reverse Lunge",
+  "Hip Thrust / Glute Bridge",
+  "Pallof Press"
+ ],
+ "Day 3":[
+  "Incline Treadmill Walk",
+  "Kettlebell Swing"
+ ],
+ "Day 4":[
+  "Chest-Supported DB Row",
+  "Neutral-Grip Pulldown",
+  "Face Pull",
+  "Hammer Curl",
+  "Farmer's Carry"
+ ],
+ "Day 5":[
+  "Complex Deadlift",
+  "Complex Row",
+  "Complex Clean",
+  "Complex Front Squat",
+  "Complex Push Press",
+  "Kettlebell Swing"
+ ]
 };
 
+// ✅ safe index-based info
 const info = {
- "Incline DB Bench (Neutral Grip)": {
-  instructions:"Upper chest press with neutral grip.",
-  video:"8iPEnn-ltC8"
- },
- "Romanian Deadlift": {
-  instructions:"Hip hinge, stretch hamstrings.",
-  video:"jc1ogzTe1cA"
- },
- "Kettlebell Swing": {
-  instructions:"Explosive hip hinge movement.",
-  video:"YSxHifyI1lA"
- }
+  "Incline DB Bench (Neutral Grip)": { video:"8iPEnn-ltC8" },
+  "Romanian Deadlift": { video:"jc1ogzTe1cA" },
+  "Kettlebell Swing": { video:"YSxHifyI1lA" },
+  "Face Pull": { video:"rep-qVOkqgk" }
 };
 
 let logs = JSON.parse(localStorage.getItem("logs") || "{}");
 
 let currentDay="Day 1";
-let view="workout";
 let openInfo=null;
-let openVideo=null;
 
 let current = {
- weight:100, reps:8, rpe:8,
- speed:3, incline:5
+ weight:100,
+ reps:8,
+ rpe:8,
+ speed:3,
+ incline:5
 };
-
-function toggleInfo(ex){
- openInfo = openInfo===ex ? null : ex;
- openVideo=null;
- render();
-}
-
-function toggleVideo(ex){
- openVideo = openVideo===ex ? null : ex;
- render();
-}
 
 function setDay(d){
  currentDay=d;
+ render();
+}
+
+function toggleInfo(ex){
+ openInfo = openInfo===ex ? null : ex;
  render();
 }
 
@@ -145,113 +141,75 @@ function isCardio(ex){
 }
 
 function logSet(ex){
+
  if(!logs[currentDay]) logs[currentDay]={};
  if(!logs[currentDay][ex]) logs[currentDay][ex]=[];
 
- let entry = isCardio(ex)
+ const entry = isCardio(ex)
  ? {speed:current.speed,incline:current.incline}
  : {weight:current.weight,reps:current.reps,rpe:current.rpe};
 
  logs[currentDay][ex].push(entry);
+
  localStorage.setItem("logs", JSON.stringify(logs));
  render();
 }
 
 function render(){
 
+ let top = "";
+
+ // top nav
+ top += `<button onclick="currentDay='Day 1';render()">Day 1</button>`;
+ top += `<button onclick="currentDay='Day 2';render()">Day 2</button>`;
+ top += `<button onclick="currentDay='Day 3';render()">Day 3</button>`;
+ top += `<button onclick="currentDay='Day 4';render()">Day 4</button>`;
+ top += `<button onclick="currentDay='Day 5';render()">Day 5</button>`;
+
+ document.getElementById("top").innerHTML = top;
+
  let html="";
 
- if(view==="workout"){
+ workouts[currentDay].forEach(ex=>{
 
-  for(let d in workouts){
-   html+=`<button class="${d===currentDay?'active day-btn':'day-btn'}" onclick="setDay('${d}')">${d}</button>`;
-  }
+  html += `<div class="card">`;
 
-  workouts[currentDay].forEach(ex=>{
-
-   html+=`<div class="card">`;
-
-   html+=`
-   <div class="title-row">
+  html += `
+  <div class="row">
     <b>${ex}</b>
     <button onclick="toggleInfo('${ex}')">ⓘ</button>
-   </div>
-   `;
+  </div>
+  `;
 
-   if(openInfo===ex){
-    html+=`
-    <div class="info-box">
-      ${info[ex]?.instructions || "No instructions yet"}
-
-      ${info[ex]?.video
-        ? `<br><button onclick="toggleVideo('${ex}')">▶ Watch</button>`
-        : ""
-      }
-
+  if(openInfo===ex){
+    html += `
+    <div class="small">
       ${
-        openVideo===ex
-        ? `<iframe class="video" src="https://www.youtube.com/embed/${info[ex].video}" frameborder="0;
-   }
-
-   let last = logs[currentDay]?.[ex]?.slice(-1)[0];
-
-   if(last){
-    html+=`<div class="small">
-      ${last.speed
-        ? `${last.speed} mph / ${last.incline}%`
-        : `${last.weight} x ${last.reps}`
+        info[ex]?.video
+        ? `<iframe class="video" src="https://www.youtube.com       : "No video yet"
       }
     </div>`;
-   }
+  }
 
-   html+=`<div class="controls">`;
+  const last = logs[currentDay]?.[ex]?.slice(-1)[0];
 
-   if(isCardio(ex)){
-    html+=`
-    <div class="control-row">
-      Speed ${current.speed}
-      <div>
+  if(last){
+    html += `<div class="small">
+      ${last.speed
+        ? `${last.speed}/${last.incline}`
+        : `${last.weight}x${last.reps}`}
+    </div>`;
+  }
+
+  if(isCardio(ex)){
+    html += `
+      <div class="row">Speed ${current.speed}
         <button onclick="adjust('speed',.1)">+</button>
         <button onclick="adjust('speed',-.1)">-</button>
       </div>
-    </div>
-
-    <div class="control-row">
-      Incline ${current.incline}
-      <div>
+      <div class="row">Incline ${current.incline}
         <button onclick="adjust('incline',1)">+</button>
         <button onclick="adjust('incline',-1)">-</button>
       </div>
-    </div>`;
-   } else {
-    html+=`
-    <div class="control-row">
-      Weight ${current.weight}
-      <div>
-        <button onclick="adjust('weight',5)">+</button>
-        <button onclick="adjust('weight',-5)">-</button>
-      </div>
-    </div>
-
-    <div class="control-row">
-      Reps ${current.reps}
-      <div>
-        <button onclick="adjust('reps',1)">+</button>
-        <button onclick="adjust('reps',-1)">-</button>
-      </div>
-    </div>`;
-   }
-
-   html+=`</div>`;
-   html+=`<button onclick="logSet('${ex}')">Log Set</button>`;
-   html+=`</div>`;
-  });
- }
-
- document.getElementById("app").innerHTML=html;
-}
-
-render();
-</script>
-</body>
-</html>
+    `;
+  } else {
