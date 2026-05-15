@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html>
 <head>
@@ -26,32 +25,44 @@ button {
   font-size: 13px;
 }
 
+.day-btn {
+  background: #ddd;
+  color: black;
+}
+
+.active {
+  background: #2563eb;
+  color: white;
+}
+
 .card {
   background: white;
   border-radius: 10px;
   padding: 10px;
-  margin-bottom: 12px;
+  margin-bottom: 10px;
   box-shadow: 0 2px 6px rgba(0,0,0,0.1);
 }
 
-.small { font-size: 12px; color:#666; }
-
-.info {
-  font-size: 12px;
-  background: #eef3ff;
-  padding: 6px;
-  border-radius: 6px;
-  margin-top: 6px;
+.row {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
 }
 
-.controls { margin-top: 6px; }
+.small { font-size:12px; color:#666; }
+
+.info-box {
+  background:#eef3ff;
+  padding:6px;
+  border-radius:6px;
+  margin-top:6px;
+}
 </style>
 
 </head>
-
 <body>
 
-<h2>🏋️ Training App</h2>
+<h2>🏋️ Training</h2>
 
 <div>
 <button onclick="view='workout';render()">Workout</button>
@@ -100,67 +111,45 @@ const workouts = {
 
 const info = {
  "Incline DB Bench (Neutral Grip)": {
-  instructions: "Control the descent, slight elbow tuck, drive through chest.",
-  video: "https://www.youtube.com/watch?v=8iPEnn-ltC8"
- },
- "Romanian Deadlift": {
-  instructions: "Push hips back, keep bar close, don't round back.",
-  video: "https://www.youtube.com/watch?v=jc1ogzTe1cA"
- },
- "Incline Treadmill Walk": {
-  instructions: "Maintain tall posture, steady breathing, moderate incline.",
-  video: ""
+  instructions:"Control descent, slight elbow tuck, press through chest",
+  video:"https://www.youtube.com/watch?v=8iPEnn-ltC8"
  }
 };
 
 let logs = JSON.parse(localStorage.getItem("logs") || "{}");
-let currentDay = "Day 1";
-let view = "workout";
+
+let currentDay="Day 1";
+let view="workout";
+let openInfo = null;
 
 let current = {
- weight: 100,
- reps: 8,
- rpe: 8,
- speed: 3.0,
- incline: 5
+ weight:100,
+ reps:8,
+ rpe:8,
+ speed:3,
+ incline:5
 };
 
 function save(){
- localStorage.setItem("logs", JSON.stringify(logs));
+ localStorage.setItem("logs",JSON.stringify(logs));
 }
 
-function adjust(field, val){
- current[field] = Math.max(0, current[field] + val);
+function adjust(field,val){
+ current[field]+=val;
  render();
 }
 
 function isCardio(ex){
- return currentDay === "Day 3" && ex === "Incline Treadmill Walk";
-}
-
-function toggleInfo(id){
- const el = document.getElementById(id);
- el.style.display = el.style.display === "none" ? "block" : "none";
+ return currentDay==="Day 3" && ex==="Incline Treadmill Walk";
 }
 
 function logSet(ex){
+ if(!logs[currentDay]) logs[currentDay]={};
+ if(!logs[currentDay][ex]) logs[currentDay][ex]=[];
 
- if(!logs[currentDay]) logs[currentDay] = {};
- if(!logs[currentDay][ex]) logs[currentDay][ex] = [];
-
- let entry;
-
- if(isCardio(ex)){
-  entry = { speed: current.speed, incline: current.incline };
- }
- else{
-  entry = {
-   weight: current.weight,
-   reps: current.reps,
-   rpe: current.rpe,
-   score: current.weight * current.reps
-  };
- }
+ let entry = isCardio(ex)
+ ? {speed:current.speed,incline:current.incline}
+ : {weight:current.weight,reps:current.reps};
 
  logs[currentDay][ex].push(entry);
  save();
@@ -169,107 +158,120 @@ function logSet(ex){
 
 function render(){
 
- let html = "";
+ let html="";
 
- if(view === "workout"){
+ if(view==="workout"){
 
+  // Days row
   for(let d in workouts){
-   html += `<button onclick="currentDay='${d}';render()">${d}</button>`;
+   html+=`<button class="day-btn ${d===currentDay?'active':''}" onclick="currentDay='${d}';render()">${d}</button>`;
   }
 
-  workouts[currentDay].forEach(ex => {
+  workouts[currentDay].forEach(ex=>{
 
-   let id = ex.replace(/[^a-z0-9]/gi,"");
+   html+=`<div class="card">`;
 
-   html += `<div class="card"><b>${ex}</b>
-   <button onclick="toggleInfo('${id}')">ⓘ</button>`;
+   // header row
+   html+=`
+   <div class="row">
+    <b>${ex}</b>
+    <button onclick="openInfo='${ex}';render()">ⓘ</button>
+   </div>`;
 
-   if(info[ex]){
-     html += `<div id="${id}" class="info" style="display:none">
-       ${info[ex].instructions || ""}
-       ${info[ex].video ? `<br>${info[ex].video}▶ Video</a>` : ""}
-     </div>`;
+   // info section
+   if(openInfo===ex && info[ex]){
+    html+=`
+    <div class="info-box">
+      ${info[ex].instructions}
+      ${info[ex].video ? `<br><a href="${info[ex].video}">`:""}
+    </div>`;
    }
 
    let last = logs[currentDay]?.[ex]?.slice(-1)[0];
 
    if(last){
-     if(last.speed){
-       html += `<div class="small">Last: ${last.speed} mph / ${last.incline}%</div>`;
-     } else {
-       html += `<div class="small">Last: ${last.weight} x ${last.reps}</div>`;
-     }
+    html+=`<div class="small">
+      ${last.speed 
+        ? `${last.speed} mph / ${last.incline}%`
+        : `${last.weight} x ${last.reps}`
+      }
+    </div>`;
    }
 
+   // Controls
    if(isCardio(ex)){
-     html += `
-       <div class="controls">
-         Speed ${current.speed}
-         <button onclick="adjust('speed',.1)">+</button>
-         <button onclick="adjust('speed',-.1)">-</button>
-       </div>
-       <div class="controls">
-         Incline ${current.incline}
-         <button onclick="adjust('incline',1)">+</button>
-         <button onclick="adjust('incline',-1)">-</button>
-       </div>
-     `;
+    html+=`
+    <div class="row">
+      <span>Speed ${current.speed}</span>
+      <div>
+        <button onclick="adjust('speed',.1)">+</button>
+        <button onclick="adjust('speed',-.1)">-</button>
+      </div>
+    </div>
+
+    <div class="row">
+      <span>Incline ${current.incline}</span>
+      <div>
+        <button onclick="adjust('incline',1)">+</button>
+        <button onclick="adjust('incline',-1)">-</button>
+      </div>
+    </div>
+    `;
+
    } else {
 
-     html += `
-       <div class="controls">
-         W ${current.weight}
-         <button onclick="adjust('weight',5)">+</button>
-         <button onclick="adjust('weight',-5)">-</button>
-       </div>
+    html+=`
+    <div class="row">
+      <span>Weight ${current.weight}</span>
+      <div>
+        <button onclick="adjust('weight',5)">+</button>
+        <button onclick="adjust('weight',-5)">-</button>
+      </div>
+    </div>
 
-       <div class="controls">
-         R ${current.reps}
-         <button onclick="adjust('reps',1)">+</button>
-         <button onclick="adjust('reps',-1)">-</button>
-       </div>
-     `;
+    <div class="row">
+      <span>Reps ${current.reps}</span>
+      <div>
+        <button onclick="adjust('reps',1)">+</button>
+        <button onclick="adjust('reps',-1)">-</button>
+      </div>
+    </div>
+    `;
    }
 
-   html += `<button onclick="logSet('${ex}')">Log</button>`;
+   html+=`<button onclick="logSet('${ex}')">Log</button>`;
 
    let sets = logs[currentDay]?.[ex] || [];
-
-   sets.forEach(s => {
-     if(s.speed){
-       html += `<div class="small">${s.speed} mph / ${s.incline}%</div>`;
-     } else {
-       html += `<div class="small">${s.weight} x ${s.reps}</div>`;
-     }
+   sets.forEach(s=>{
+    html+=`<div class="small">
+    ${s.speed ? `${s.speed}/${s.incline}` : `${s.weight}x${s.reps}`}
+    </div>`;
    });
 
-   html += `</div>`;
+   html+=`</div>`;
   });
  }
 
- if(view === "audit"){
-  html = "<h3>Progress</h3>";
+ if(view==="audit"){
+  html="<h3>Progress</h3>";
 
   for(let d in workouts){
    workouts[d].forEach(ex=>{
-     let last = logs[d]?.[ex]?.slice(-1)[0];
-     if(last){
-       if(last.speed){
-         html += `<div class="small">${ex}: ${last.speed} / ${last.incline}%</div>`;
-       } else {
-         html += `<div class="small">${ex}: ${last.weight} x ${last.reps}</div>`;
-       }
-     }
+    let last=logs[d]?.[ex]?.slice(-1)[0];
+    if(last){
+     html+=`<div class="small">
+     ${ex}: ${last.speed ? `${last.speed}/${last.incline}` : `${last.weight}x${last.reps}`}
+     </div>`;
+    }
    });
   }
  }
 
- document.getElementById("app").innerHTML = html;
+ document.getElementById("app").innerHTML=html;
 }
 
 render();
 
 </script>
-
 </body>
 </html>
