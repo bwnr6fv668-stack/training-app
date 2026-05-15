@@ -4,29 +4,53 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Inner Strength</title>
 
+<!-- ✅ iPhone app icon -->
+<link rel="apple-touch-icon" href="logo.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Inner Strength">
-<link rel="apple-touch-icon" href="icon.png">
 
 <style>
 body {
   font-family: -apple-system, Arial;
-  background: #f2f4f7;
-  padding: 14px;
-  max-width: 480px;
+  max-width: 500px;
   margin: auto;
+  padding: 14px;
+  background: #f2f4f7;
 }
 
-<div style="text-align:center; margin-bottom:10px;">
-  <img src="logo.png" style="width:80px; border-radius:18px;">
-  <h2 style="margin-top:6px;">Inner Strength</h2>
-</div>
+h2 {
   text-align:center;
-  margin-top:5px;
+  margin-top:6px;
   margin-bottom:12px;
   font-weight:600;
 }
 
+/* ✅ LOGO */
+.logo {
+  width:80px;
+  display:block;
+  margin:auto;
+}
+
+/* ✅ NAV */
+.day-row {
+  display:flex;
+  overflow-x:auto;
+  margin-bottom:10px;
+}
+
+.day-btn {
+  background:#ddd;
+  color:black;
+  padding:8px;
+}
+
+.active {
+  background:#2563eb;
+  color:white;
+}
+
+/* ✅ BUTTON */
 button {
   border:none;
   border-radius:10px;
@@ -37,22 +61,11 @@ button {
   font-size:14px;
 }
 
-.day-row {
-  display:flex;
-  overflow-x:auto;
-  margin-bottom:10px;
+button:active {
+  transform:scale(0.96);
 }
 
-.day-btn {
-  background:#ddd;
-  color:black;
-}
-
-.active {
-  background:#2563eb;
-  color:white;
-}
-
+/* ✅ CARD */
 .card {
   background:white;
   border-radius:14px;
@@ -72,6 +85,7 @@ button {
   color:#6b7280;
 }
 
+/* ✅ INFO BOX */
 .info-box {
   background:#eef3ff;
   padding:10px;
@@ -79,6 +93,7 @@ button {
   margin-top:8px;
 }
 
+/* ✅ RPE */
 .rpe-btn {
   background:#e5e7eb;
   color:black;
@@ -94,10 +109,9 @@ button {
 
 <body>
 
-<div style="text-align:center;">
-<img src="icon.png" width="70">
+<!-- ✅ LOGO + TITLE -->
+<img src="logo.png" class="logo">
 <h2>Inner Strength</h2>
-</div>
 
 <div id="app"></div>
 
@@ -140,50 +154,28 @@ const workouts = {
 };
 
 const info = {
-
-"Incline DB Bench (Neutral Grip)":"Set bench to incline. Keep elbows slightly tucked. Control down, press through upper chest.",
-
-"Half-Kneeling Landmine Press":"Stay upright, core tight. Press forward/up, avoid leaning back.",
-
-"DB Fly (Short Range)":"Keep slight elbow bend. Lower only to safe stretch, squeeze chest at top.",
-
-"Lateral Raise":"Raise arms to shoulder height. Lead with elbows. Slow on the way down.",
-
-"Triceps Pressdown":"Elbows pinned to sides. Fully extend arms, slow return.",
-
-"Goblet Squat to Box":"Sit back onto box. Keep chest tall and knees out.",
-
-"Romanian Deadlift":"Push hips back. Keep bar close. Feel stretch in hamstrings.",
-
-"Reverse Lunge":"Step back, drop straight down. Drive through front leg.",
-
-"Hip Thrust / Glute Bridge":"Drive hips up. Pause at top. Squeeze glutes hard.",
-
-"Pallof Press":"Press straight out. Resist rotation. Core tight.",
-
-"Incline Treadmill Walk":"Stay upright. Steady pace. Controlled breathing.",
-
-"Kettlebell Swing":"Hinge at hips. Explode forward. Arms relaxed.",
-
-"Chest-Supported DB Row":"Pull elbows toward hips. Keep chest on bench.",
-
-"Neutral-Grip Pulldown":"Pull to upper chest. Control upward phase.",
-
-"Face Pull":"Pull toward face. Elbows high. Squeeze rear delts.",
-
-"Hammer Curl":"Neutral grip. No swinging. Slow control.",
-
-"Farmer's Carry":"Stand tall. Keep shoulders tight. Walk controlled.",
-
-"Complex Deadlift":"Maintain tight position. Controlled lift.",
-
-"Complex Row":"Pull bar to torso. Control descent.",
-
-"Complex Clean":"Explosive hip drive. Catch smoothly.",
-
-"Complex Front Squat":"Elbows high. Stay upright.",
-
-"Complex Push Press":"Dip slightly then explode upward."
+"Incline DB Bench (Neutral Grip)":"Control descent, keep elbows tucked, press through upper chest.",
+"Half-Kneeling Landmine Press":"Stay upright, engage core, press forward and up.",
+"DB Fly (Short Range)":"Small range, controlled stretch, squeeze chest.",
+"Lateral Raise":"Lift to shoulder level, control down.",
+"Triceps Pressdown":"Elbows tight, full extension.",
+"Goblet Squat to Box":"Sit back, chest up, drive through heels.",
+"Romanian Deadlift":"Hip hinge, stretch hamstrings, neutral spine.",
+"Reverse Lunge":"Step back, control descent, push through front leg.",
+"Hip Thrust / Glute Bridge":"Drive hips up, squeeze glutes at top.",
+"Pallof Press":"Press straight out, resist rotation.",
+"Incline Treadmill Walk":"Keep posture tall, steady breathing.",
+"Kettlebell Swing":"Explosive hip hinge, arms relaxed.",
+"Chest-Supported DB Row":"Pull elbows back, squeeze lats.",
+"Neutral-Grip Pulldown":"Pull to chest, control return.",
+"Face Pull":"Pull high, squeeze rear delts.",
+"Hammer Curl":"Neutral grip, controlled motion.",
+"Farmer's Carry":"Walk tall, core tight.",
+"Complex Deadlift":"Controlled hinge start.",
+"Complex Row":"Pull to torso.",
+"Complex Clean":"Explosive upward movement.",
+"Complex Front Squat":"Elbows high, upright torso.",
+"Complex Push Press":"Dip then drive overhead."
 };
 
 let logs = JSON.parse(localStorage.getItem("logs") || "{}");
@@ -191,7 +183,13 @@ let logs = JSON.parse(localStorage.getItem("logs") || "{}");
 let currentDay="Day 1";
 let openInfo=null;
 
-let current = { weight:100, reps:8, rpe:8, speed:3, incline:5 };
+let current = {
+ weight:100,
+ reps:8,
+ rpe:8,
+ speed:3,
+ incline:5
+};
 
 function toggleInfoSafe(btn){
  const ex = btn.getAttribute("data-exercise");
@@ -229,60 +227,60 @@ function render(){
  let html="<div class='day-row'>";
 
  for(let d in workouts){
-   html+=`<button class="day-btn ${d===currentDay?'active':''}" onclick="setDay('${d}')">${d}</button>`;
+ html+=`<button class="day-btn ${d===currentDay?'active':''}" onclick="setDay('${d}')">${d}</button>`;
  }
+
  html+="</div>";
 
  workouts[currentDay].forEach(ex=>{
 
-   html+=`<div class="card">`;
+ html+=`<div class="card">`;
 
-   html+=`
-   <div class="row">
-     <b>${ex}</b>
-     <button onclick="toggleInfoSafe(this)" data-exercise="${ex}">ⓘ</button>
+ html+=`
+ <div class="row">
+  <b>${ex}</b>
+  <button onclick="toggleInfoSafe(this)" data-exercise="${ex}">ⓘ</button>
+ </div>`;
+
+ if(openInfo===ex){
+   html+=`<div class="info-box">${info[ex]}</div>`;
+ }
+
+ let last = logs[currentDay]?.[ex]?.slice(-1)[0];
+
+ if(last){
+   html+=`<div class="small">
+   Last: ${last.speed
+    ? `${last.speed}/${last.incline}`
+    : `${last.weight}x${last.reps}`}
    </div>`;
+ }
 
-   if(openInfo===ex){
-     html+=`<div class="info-box">${info[ex]}</div>`;
-   }
+ if(isCardio(ex)){
+   html+=`
+   Speed ${current.speed}
+   <button onclick="adjust('speed',.1)">+</button>
+   <button onclick="adjust('speed',-.1)">-</button><br>
+   Incline ${current.incline}
+   <button onclick="adjust('incline',1)">+</button>
+   <button onclick="adjust('incline',-1)">-</button>`;
+ } else {
+   html+=`
+   Weight ${current.weight}
+   <button onclick="adjust('weight',5)">+</button>
+   <button onclick="adjust('weight',-5)">-</button><br>
+   Reps ${current.reps}
+   <button onclick="adjust('reps',1)">+</button>
+   <button onclick="adjust('reps',-1)">-</button><br>
+   RPE:
+   ${[6,7,8,9].map(r=>
+   `<button class="${current.rpe===r?'rpe-active':'rpe-btn'}"
+   onclick="current.rpe=${r};render()">${r}</button>`).join("")}`;
+ }
 
-   let last = logs[currentDay]?.[ex]?.slice(-1)[0];
+ html+=`<br><button onclick="logSetSafe(this)" data-exercise="${ex}">Track Set</button>`;
 
-   if(last){
-     html+=`<div class="small">
-       Last: ${last.speed
-         ? `${last.speed}/${last.incline}`
-         : `${last.weight}x${last.reps}`}
-     </div>`;
-   }
-
-   if(isCardio(ex)){
-     html+=`
-     Speed ${current.speed}
-     <button onclick="adjust('speed',.1)">+</button>
-     <button onclick="adjust('speed',-.1)">-</button><br>
-     Incline ${current.incline}
-     <button onclick="adjust('incline',1)">+</button>
-     <button onclick="adjust('incline',-1)">-</button>`;
-   } else {
-     html+=`
-     Weight ${current.weight}
-     <button onclick="adjust('weight',5)">+</button>
-     <button onclick="adjust('weight',-5)">-</button><br>
-     Reps ${current.reps}
-     <button onclick="adjust('reps',1)">+</button>
-     <button onclick="adjust('reps',-1)">-</button><br>
-
-     RPE:
-     ${[6,7,8,9].map(r=>
-       `<button class="${current.rpe===r?'rpe-active':'rpe-btn'}"
-       onclick="current.rpe=${r};render()">${r}</button>`
-     ).join("")}`;
-   }
-
-   html+=`<br><button onclick="logSetSafe(this)" data-exercise="${ex}">Track Set</button>`;
-   html+=`</div>`;
+ html+=`</div>`;
  });
 
  document.getElementById("app").innerHTML=html;
