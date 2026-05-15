@@ -23,6 +23,7 @@ button {
   background: #2563eb;
   color: white;
   font-size: 13px;
+  cursor: pointer;
 }
 
 .day-btn {
@@ -113,10 +114,16 @@ const info = {
  "Incline DB Bench (Neutral Grip)": {
   instructions:"Control descent, slight elbow tuck, press through chest.",
   video:"https://www.youtube.com/watch?v=8iPEnn-ltC8"
+ },
+ "Romanian Deadlift": {
+  instructions:"Push hips back, keep bar close, neutral spine.",
+  video:"https://www.youtube.com/watch?v=jc1ogzTe1cA"
  }
 };
 
+// ✅ FIXED LINE
 let logs = JSON.parse(localStorage.getItem("logs") || "{}");
+
 let currentDay="Day 1";
 let view="workout";
 let openInfo=null;
@@ -129,7 +136,6 @@ let current = {
  incline:5
 };
 
-// ✅ Safe functions
 function toggleInfo(ex){
  openInfo = (openInfo === ex) ? null : ex;
  render();
@@ -150,6 +156,7 @@ function isCardio(ex){
 }
 
 function logSet(ex){
+
  if(!logs[currentDay]) logs[currentDay]={};
  if(!logs[currentDay][ex]) logs[currentDay][ex]=[];
 
@@ -168,7 +175,6 @@ function render(){
 
  if(view==="workout"){
 
-  // Days
   for(let d in workouts){
    html+=`<button class="day-btn ${d===currentDay?'active':''}" onclick="setDay('${d}')">${d}</button>`;
   }
@@ -183,12 +189,17 @@ function render(){
     <button onclick="toggleInfo('${ex}')">ⓘ</button>
    </div>`;
 
-   // ✅ Info (safe now)
-   if(openInfo===ex && info[ex]){
+   // ✅ FIXED: always shows now
+   if(openInfo===ex){
+
     html+=`
     <div class="info-box">
-      ${info[ex].instructions}
-      ${info[ex].video ? `<br><button onclick="window.open('${info[ex].video}','_blank')">▶ Watch</button>`:""}
+      ${info[ex]?.instructions || "No instructions added yet"}
+
+      ${info[ex]?.video
+        ? `<br><button onclick="window.open('${info[ex].video}','_blank')">▶ Watch</button>`
+        : ""
+      }
     </div>`;
    }
 
@@ -255,9 +266,10 @@ function render(){
    html+=`<button onclick="logSet('${ex}')">Log</button>`;
 
    let sets = logs[currentDay]?.[ex] || [];
+
    sets.forEach(s=>{
      html+=`<div class="small">
-       ${s.speed ? `${s.speed}/${s.incline}` : `${s.weight}x${s.reps}`}
+       ${s.speed ? `${s.speed}/${s.incline}` : `${s.weight}x${s.reps} (RPE ${s.rpe||"-"})`}
      </div>`;
    });
 
@@ -291,5 +303,4 @@ render();
 </script>
 </body>
 </html>
-
-
+``
