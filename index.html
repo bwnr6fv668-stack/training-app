@@ -1,39 +1,49 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Training App</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Training App</title>
 
-  <style>
-    body {
-      font-family: Arial;
-      padding: 12px;
-      max-width: 500px;
-      margin: auto;
-    }
+<style>
+body {
+  font-family: Arial;
+  padding: 10px;
+  max-width: 500px;
+  margin: auto;
+}
 
-    button {
-      padding: 6px;
-      margin: 3px;
-    }
+button {
+  margin: 3px;
+  padding: 6px;
+}
 
-    .card {
-      border: 1px solid #ddd;
-      border-radius: 8px;
-      padding: 8px;
-      margin-bottom: 10px;
-    }
-  </style>
+.card {
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 8px;
+  margin-bottom: 10px;
+}
+
+.small {
+  font-size: 12px;
+}
+</style>
+
 </head>
 
 <body>
 
 <h2>Training App</h2>
 
-<div id="days"></div>
-<div id="workouts"></div>
+<div>
+  <button onclick="view='workout'; render()">Workout</button>
+  <button onclick="view='audit'; render()">Audit</button>
+</div>
+
+<div id="app"></div>
 
 <script>
+
 const WORKOUT_DAYS = {
   "Day 1": ["Incline DB Bench", "Landmine Press", "Lateral Raise"],
   "Day 2": ["RDL", "Reverse Lunge", "Hip Thrust"],
@@ -42,58 +52,183 @@ const WORKOUT_DAYS = {
   "Day 5": ["Deadlift", "Front Squat", "Push Press"]
 };
 
+let logs = JSON.parse(localStorage.getItem("logs") || "{}");
+
+let view = "workout";
 let currentDay = "Day 1";
 
-function renderDays() {
-  const container = document.getElementById("days");
-  container.innerHTML = "";
+let current = {
+  weight: 100,
+  reps: 8,
+  rpe: 8
+};
 
-  Object.keys(WORKOUT_DAYS).forEach(day => {
-    const btn = document.createElement("button");
-    btn.innerText = day;
-    btn.onclick = () => {
-      currentDay = day;
-      renderWorkouts();
-    };
-    container.appendChild(btn);
-  });
+function save() {
+  localStorage.setItem("logs", JSON.stringify(logs));
 }
 
-function logSet(exercise) {
-  const weight = prompt("Weight?");
-  const reps = prompt("Reps?");
-  const rpe = prompt("RPE?");
+function adjust(field, amount) {
+  current[field] = Math.max(0, current[field] + amount);
+  render();
+}
+
+function logSet(ex) {
+  if (!logs[currentDay]) logs[currentDay] = {};
+  if (!logs[currentDay][ex]) logs[currentDay][ex] = [];
+
+  const entry = {
+    weight: current.weight,
+    reps: current.reps,
+    rpe: current.rpe,
+    score: current.weight * current.reps
+  };
+
+  logs[currentDay][ex].push(entry);
+  save();
+  render();
+}
+
+function deleteSet(ex, i) {
+  if (!confirm("Delete set?")) return;
+
+  logs[currentDay][ex].splice(i, 1);
+  save();
+  render();
+}
+
+function editSet(ex, i) {
+  let s = logs[currentDay][ex][i];
+
+  let weight = prompt("Weight", s.weight);
+  let reps = prompt("Reps", s.reps);
+  let rpe = prompt("RPE", s.rpe);
 
   if (!weight || !reps) return;
 
-  alert(exercise + "\\n" + weight + " x " + reps + " (RPE " + rpe + ")");
+  logs[currentDay][ex][i] = {
+    weight: +weight,
+    reps: +reps,
+    rpe: +rpe,
+    score: weight * reps
+  };
+
+  save();
+  render();
 }
 
-function renderWorkouts() {
-  const container = document.getElementById("workouts");
-  container.innerHTML = "";
-
-  WORKOUT_DAYS[currentDay].forEach(ex => {
-    const card = document.createElement("div");
-    card.className = "card";
-
-    const title = document.createElement("strong");
-    title.innerText = ex;
-
-    const btn = document.createElement("button");
-    btn.innerText = "+ Add Set";
-    btn.onclick = () => logSet(ex);
-
-    card.appendChild(title);
-    card.appendChild(document.createElement("br"));
-    card.appendChild(btn);
-
-    container.appendChild(card);
-  });
+function getBest(ex) {
+  let sets = logs[currentDay]?.[ex] || [];
+  if (!sets.length) return null;
+  return sets.reduce((a, b) => a.score > b.score ? a : b);
 }
 
-renderDays();
-renderWorkouts();
+function getLast(ex) {
+  let sets = logs[currentDay]?.[ex] || [];
+  return sets.length ? sets[sets.length-1] : null;
+}
+
+function buildAudit() {
+  let output = "";
+
+  for (let day in WORKOUT_DAYS) {
+    WORKOUT_DAYS[day].forEach(ex => {
+      let sets = logs[day]?.[ex] || [];
+      if (sets.length) {
+        let best = sets.reduce((a,b)=>a.score>b.score?a:b);
+        output += `
+          <div class="small">
+            <b>${ex}</b> (${day})<br>
+            ${best.weight} x ${best.reps} → ${best.score}
+          </div>
+        `;
+      }
+    })
+  }
+
+  return output;
+}
+
+function render() {
+  let html = "";
+
+  if (view === "workout") {
+
+    html += `<div>`;
+
+    for (let d in WORKOUT_DAYS) {
+      html += `<button onclick="currentDay='${d}';render()">${d}</button>`;
+    }
+
+    html += `</div>`;
+
+    WORKOUT_DAYS[currentDay].forEach(ex => {
+
+      html += `<div class="card">`;
+
+      html += `<b>${ex}</b>`;
+
+      let last = getLast(ex);
+      if (last) {
+        html += `<div class="small">Last: ${last.weight} x ${last.reps}</div>`;
+      }
+
+      html += `
+        <div>
+          W:${current.weight}
+          <button onclick="adjust('weight',5)">+5</button>
+          <button onclick="adjust('weight',-5)">-5</button>
+        </div>
+
+        <div>
+          R:${current.reps}
+          <button onclick="adjust('reps',1)">+1</button>
+          <button onclick="adjust('reps',-1)">-1</button>
+        </div>
+
+        <div>
+          RPE:
+          ${[6,7,8,9].map(r => 
+            `<button onclick="current.rpe=${r};render()">${r}</button>`
+          ).join("")}
+        </div>
+
+        <button onclick="logSet('${ex}')">✅ Log</button>
+      `;
+
+      let sets = logs[currentDay]?.[ex] || [];
+
+      sets.forEach((s,i)=>{
+        html += `
+          <div class="small">
+            ${s.weight} x ${s.reps} → ${s.score}
+            <button onclick="editSet('${ex}',${i})">✏️</button>
+            <button onclick="deleteSet('${ex}',${i})">🗑️</button>
+          </div>
+        `
+      });
+
+      let best = getBest(ex);
+      if (best) {
+        html += `<div class="small" style="color:green">
+          Best: ${best.weight} x ${best.reps}
+        </div>`;
+      }
+
+      html += `</div>`;
+    });
+
+  }
+
+  if (view === "audit") {
+    html += `<h3>Strength Audit</h3>`;
+    html += buildAudit();
+  }
+
+  document.getElementById("app").innerHTML = html;
+}
+
+render();
+
 </script>
 
 </body>
