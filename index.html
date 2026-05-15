@@ -1,5 +1,5 @@
 
-<!DOCTYPE html>
+!DOCTYPE html>
 <html>
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -61,11 +61,43 @@ button {
 <script>
 
 const WORKOUT_DAYS = {
-  "Day 1": ["Incline DB Bench","Landmine Press","Lateral Raise"],
-  "Day 2": ["RDL","Reverse Lunge","Hip Thrust"],
-  "Day 3": ["Incline Walk"],
-  "Day 4": ["Row","Pulldown","Face Pull"],
-  "Day 5": ["Deadlift","Front Squat","Push Press"]
+  "Day 1": [
+    "Incline DB Bench (Neutral Grip)",
+    "Half‑Kneeling Landmine Press",
+    "DB Fly (Short Range)",
+    "Lateral Raise",
+    "Triceps Pressdown"
+  ],
+
+  "Day 2": [
+    "Goblet Squat to Box",
+    "Romanian Deadlift",
+    "Reverse Lunge",
+    "Hip Thrust / Glute Bridge",
+    "Pallof Press"
+  ],
+
+  "Day 3": [
+    "Incline Treadmill Walk",
+    "Kettlebell Swing"
+  ],
+
+  "Day 4": [
+    "Chest‑Supported DB Row",
+    "Neutral‑Grip Pulldown",
+    "Face Pull",
+    "Hammer Curl",
+    "Farmer’s Carry"
+  ],
+
+  "Day 5": [
+    "Complex – Deadlift",
+    "Complex – Bent‑Over Row",
+    "Complex – Hang Clean",
+    "Complex – Front Squat",
+    "Complex – Push Press",
+    "Kettlebell Swing"
+  ]
 };
 
 let logs = JSON.parse(localStorage.getItem("logs") || "{}");
@@ -88,6 +120,10 @@ function adjust(field,amt){
   render();
 }
 
+function isCardio(ex){
+  return currentDay==="Day 3" && ex==="Incline Treadmill Walk";
+}
+
 function logSet(ex){
 
   if(!logs[currentDay]) logs[currentDay]={};
@@ -95,11 +131,8 @@ function logSet(ex){
 
   let entry;
 
-  if(currentDay==="Day 3"){
-    entry={
-      speed:current.speed,
-      incline:current.incline
-    };
+  if(isCardio(ex)){
+    entry={ speed:current.speed, incline:current.incline };
   } else {
     entry={
       weight:current.weight,
@@ -125,17 +158,13 @@ function editSet(ex,i){
 
   let s=logs[currentDay][ex][i];
 
-  if(currentDay==="Day 3"){
+  if(isCardio(ex)){
     let speed=prompt("Speed",s.speed);
     let incline=prompt("Incline",s.incline);
 
-    logs[currentDay][ex][i]={
-      speed:+speed,
-      incline:+incline
-    };
+    logs[currentDay][ex][i]={ speed:+speed, incline:+incline };
 
   } else {
-
     let weight=prompt("Weight",s.weight);
     let reps=prompt("Reps",s.reps);
     let rpe=prompt("RPE",s.rpe);
@@ -154,7 +183,7 @@ function editSet(ex,i){
 
 function getBest(ex){
   let sets=logs[currentDay]?.[ex]||[];
-  if(!sets.length||currentDay==="Day 3") return null;
+  if(!sets.length||isCardio(ex)) return null;
   return sets.reduce((a,b)=>a.score>b.score?a:b);
 }
 
@@ -174,11 +203,20 @@ function buildAudit(){
 
         if(d==="Day 3"){
           let last=sets[sets.length-1];
-          output+=`
-          <div class="audit-card">
-          <b>${ex}</b> (${d})<br>
-          Speed: ${last.speed} | Incline: ${last.incline}
-          </div>`;
+          if(last.speed){
+            output+=`
+            <div class="audit-card">
+            <b>${ex}</b> (${d})<br>
+            ${last.speed} mph | ${last.incline}%
+            </div>`;
+          } else {
+            let best=sets.reduce((a,b)=>a.score>b.score?a:b);
+            output+=`
+            <div class="audit-card">
+            <b>${ex}</b> (${d})<br>
+            ${best.weight} x ${best.reps}
+            </div>`;
+          }
         } else {
           let best=sets.reduce((a,b)=>a.score>b.score?a:b);
           output+=`
@@ -212,14 +250,14 @@ function render(){
       let last=getLast(ex);
 
       if(last){
-        if(currentDay==="Day 3"){
+        if(isCardio(ex)){
           html+=`<div class="small">Last: ${last.speed} mph | ${last.incline}%</div>`;
-        } else {
+        } else if(last.weight){
           html+=`<div class="small">Last: ${last.weight} x ${last.reps}</div>`;
         }
       }
 
-      if(currentDay==="Day 3"){
+      if(isCardio(ex)){
 
         html+=`
         <div class="controls">
@@ -267,10 +305,10 @@ function render(){
 
       sets.forEach((s,i)=>{
 
-        if(currentDay==="Day 3"){
+        if(isCardio(ex)){
           html+=`
           <div class="small">
-          ${s.speed} mph | ${s.incline}% 
+          ${s.speed} mph | ${s.incline}%
           <button onclick="editSet('${ex}',${i})">✏️</button>
           <button onclick="deleteSet('${ex}',${i})">🗑️</button>
           </div>`;
