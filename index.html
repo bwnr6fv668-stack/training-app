@@ -1,282 +1,101 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>Training App</title>
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Training App</title>
 
-    <!-- React -->
-    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
-    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+  <style>
+    body {
+      font-family: Arial;
+      padding: 12px;
+      max-width: 500px;
+      margin: auto;
+    }
 
-    <!-- Babel (compiles your JSX in browser) -->
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-  </head>
+    button {
+      padding: 6px;
+      margin: 3px;
+    }
 
-  <body>
-    <div id="root"></div>
+    .card {
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 8px;
+      margin-bottom: 10px;
+    }
+  </style>
+</head>
 
-    <script type="text/babel">
+<body>
 
-// --- START APP CODE ---
- import { useState, useEffect } from "react";
+<h2>Training App</h2>
 
+<div id="days"></div>
+<div id="workouts"></div>
+
+<script>
 const WORKOUT_DAYS = {
-  "Day 1 – Upper Push": ["Incline DB Bench", "Landmine Press", "Lateral Raise"],
-  "Day 2 – Lower Body": ["RDL", "Reverse Lunge", "Hip Thrust"],
-  "Day 3 – Cardio": ["Incline Walk"],
-  "Day 4 – Upper Pull": ["Row", "Pulldown", "Face Pull"],
-  "Day 5 – Full Body": ["Deadlift", "Front Squat", "Push Press"],
+  "Day 1": ["Incline DB Bench", "Landmine Press", "Lateral Raise"],
+  "Day 2": ["RDL", "Reverse Lunge", "Hip Thrust"],
+  "Day 3": ["Incline Walk"],
+  "Day 4": ["Row", "Pulldown", "Face Pull"],
+  "Day 5": ["Deadlift", "Front Squat", "Push Press"]
 };
 
-export default function App() {
-  const [view, setView] = useState("workout");
-  const [day, setDay] = useState("Day 1 – Upper Push");
+let currentDay = "Day 1";
 
-  const [logs, setLogs] = useState(() => {
-    const saved = localStorage.getItem("logs");
-    return saved ? JSON.parse(saved) : {};
-  });
+function renderDays() {
+  const container = document.getElementById("days");
+  container.innerHTML = "";
 
-  const [current, setCurrent] = useState({
-    weight: 100,
-    reps: 8,
-    rpe: 8,
-  });
-
-  useEffect(() => {
-    localStorage.setItem("logs", JSON.stringify(logs));
-  }, [logs]);
-
-  // ✅ Adjust controls
-  const adjust = (field, amount) => {
-    setCurrent((prev) => ({
-      ...prev,
-      [field]: Math.max(0, prev[field] + amount),
-    }));
-  };
-
-  // ✅ Log a set
-  const logSet = (exercise) => {
-    const entry = {
-      ...current,
-      score: current.weight * current.reps,
+  Object.keys(WORKOUT_DAYS).forEach(day => {
+    const btn = document.createElement("button");
+    btn.innerText = day;
+    btn.onclick = () => {
+      currentDay = day;
+      renderWorkouts();
     };
+    container.appendChild(btn);
+  });
+}
 
-    setLogs((prev) => ({
-      ...prev,
-      [day]: {
-        ...(prev[day] || {}),
-        [exercise]: [...(prev[day]?.[exercise] || []), entry],
-      },
-    }));
-  };
+function logSet(exercise) {
+  const weight = prompt("Weight?");
+  const reps = prompt("Reps?");
+  const rpe = prompt("RPE?");
 
-  // ✅ Delete set
-  const deleteSet = (exercise, index) => {
-    if (!window.confirm("Delete this set?")) return;
+  if (!weight || !reps) return;
 
-    setLogs((prev) => {
-      const updated = [...(prev[day]?.[exercise] || [])];
-      updated.splice(index, 1);
+  alert(exercise + "\\n" + weight + " x " + reps + " (RPE " + rpe + ")");
+}
 
-      return {
-        ...prev,
-        [day]: {
-          ...(prev[day] || {}),
-          [exercise]: updated,
-        },
-      };
-    });
-  };
+function renderWorkouts() {
+  const container = document.getElementById("workouts");
+  container.innerHTML = "";
 
-  // ✅ Edit set
-  const editSet = (exercise, index) => {
-    const set = logs[day][exercise][index];
+  WORKOUT_DAYS[currentDay].forEach(ex => {
+    const card = document.createElement("div");
+    card.className = "card";
 
-    const weight = prompt("Weight:", set.weight);
-    const reps = prompt("Reps:", set.reps);
-    const rpe = prompt("RPE:", set.rpe);
+    const title = document.createElement("strong");
+    title.innerText = ex;
 
-    if (!weight || !reps) return;
+    const btn = document.createElement("button");
+    btn.innerText = "+ Add Set";
+    btn.onclick = () => logSet(ex);
 
-    const updated = {
-      weight: Number(weight),
-      reps: Number(reps),
-      rpe: Number(rpe),
-      score: Number(weight) * Number(reps),
-    };
+    card.appendChild(title);
+    card.appendChild(document.createElement("br"));
+    card.appendChild(btn);
 
-    setLogs((prev) => {
-      const newSets = [...prev[day][exercise]];
-      newSets[index] = updated;
+    container.appendChild(card);
+  });
+}
 
-      return {
-        ...prev,
-        [day]: {
-          ...(prev[day] || {}),
-          [exercise]: newSets,
-        },
-      };
-    });
-  };
+renderDays();
+renderWorkouts();
+</script>
 
-  // ✅ Best set calculation
-  const getBestSet = (exercise) => {
-    const sets = logs[day]?.[exercise] || [];
-    if (!sets.length) return null;
-    return sets.reduce((best, s) => (s.score > best.score ? s : best));
-  };
-
-  // ✅ NEW: Last set tracking
-  const getLastSet = (exercise) => {
-    const sets = logs[day]?.[exercise] || [];
-    if (!sets.length) return null;
-    return sets[sets.length - 1];
-  };
-
-  // ✅ Strength audit
-  const buildAudit = () => {
-    const audit = [];
-
-    Object.keys(WORKOUT_DAYS).forEach((d) => {
-      WORKOUT_DAYS[d].forEach((ex) => {
-        const sets = logs[d]?.[ex] || [];
-        if (sets.length > 0) {
-          const best = sets.reduce((a, b) => (a.score > b.score ? a : b));
-          audit.push({ exercise: ex, day: d, best });
-        }
-      });
-    });
-
-    return audit;
-  };
-
-  return (
-    <div
-      style={{
-        padding: 12,
-        maxWidth: 500,
-        margin: "auto",
-        fontFamily: "Arial",
-      }}
-    >
-      <h2>Training App</h2>
-
-      {/* NAV */}
-      <div style={{ marginBottom: 10 }}>
-        <button onClick={() => setView("workout")}>Workout</button>
-        <button onClick={() => setView("audit")}>Audit</button>
-      </div>
-
-      {/* WORKOUT VIEW */}
-      {view === "workout" && (
-        <>
-          {/* DAYS */}
-          <div style={{ marginBottom: 10 }}>
-            {Object.keys(WORKOUT_DAYS).map((d) => (
-              <button
-                key={d}
-                onClick={() => setDay(d)}
-                style={{
-                  margin: 3,
-                  padding: "6px 8px",
-                  background: d === day ? "#333" : "#ccc",
-                  color: d === day ? "#fff" : "#000",
-                }}
-              >
-                {d}
-              </button>
-            ))}
-          </div>
-
-          {/* EXERCISES */}
-          {WORKOUT_DAYS[day].map((ex) => (
-            <div
-              key={ex}
-              style={{
-                border: "1px solid #ddd",
-                borderRadius: 8,
-                padding: 8,
-                marginBottom: 10,
-              }}
-            >
-              <strong>{ex}</strong>
-
-              {/* ✅ LAST SET */}
-              {getLastSet(ex) && (
-                <div style={{ fontSize: 12, color: "#777" }}>
-                  Last: {getLastSet(ex).weight} x {getLastSet(ex).reps} (RPE{" "}
-                  {getLastSet(ex).rpe})
-                </div>
-              )}
-
-              {/* CONTROLS */}
-              <div style={{ display: "flex", gap: 10, marginTop: 5 }}>
-                <div>
-                  W: {current.weight}
-                  <br />
-                  <button onClick={() => adjust("weight", 5)}>+5</button>
-                  <button onClick={() => adjust("weight", -5)}>-5</button>
-                </div>
-
-                <div>
-                  R: {current.reps}
-                  <br />
-                  <button onClick={() => adjust("reps", 1)}>+1</button>
-                  <button onClick={() => adjust("reps", -1)}>-1</button>
-                </div>
-
-                <div>
-                  RPE:
-                  <br />
-                  {[6, 7, 8, 9].map((r) => (
-                    <button
-                      key={r}
-                      onClick={() => setCurrent({ ...current, rpe: r })}
-                    >
-                      {r}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              <button style={{ marginTop: 6 }} onClick={() => logSet(ex)}>
-                ✅ Log
-              </button>
-
-              {/* SETS */}
-              {(logs[day]?.[ex] || []).map((s, i) => (
-                <div key={i} style={{ fontSize: 12 }}>
-                  {s.weight} x {s.reps} (RPE {s.rpe}) → {s.score}
-                  <button onClick={() => editSet(ex, i)}>✏️</button>
-                  <button onClick={() => deleteSet(ex, i)}>🗑️</button>
-                </div>
-              ))}
-
-              {/* BEST */}
-              {getBestSet(ex) && (
-                <div style={{ fontSize: 12, color: "green" }}>
-                  Best: {getBestSet(ex).weight} x {getBestSet(ex).reps}
-                </div>
-              )}
-            </div>
-          ))}
-        </>
-      )}
-
-      {/* AUDIT */}
-      {view === "audit" && (
-        <div>
-          <h3>Strength Audit</h3>
-          {buildAudit().map((item, i) => (
-            <div key={i}>
-              <strong>{item.exercise}</strong> ({item.day})<br />
-              {item.best.weight} x {item.best.reps} → {item.best.score}
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-}     
+</body>
+</html>
+``
